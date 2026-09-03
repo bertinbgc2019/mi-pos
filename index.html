@@ -300,5 +300,21 @@
   </div>
 
   <script src="app.js"></script>
+  <!-- Pantalla de Bloqueo por Membresía Vencida -->
+  <div id="modal-licencia-bloqueo" class="fixed inset-0 bg-slate-900 bg-opacity-95 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-lg shadow-2xl p-6 max-w-md text-center border-t-8 border-red-600">
+      <div class="text-5xl mb-3">⚠️</div>
+      <h2 class="text-xl font-bold text-gray-800 mb-2">Membresía Vencida</h2>
+      <p class="text-sm text-gray-600 mb-4">
+        El periodo de suscripción de este sistema ha expirado o requiere renovación para continuar operando.
+      </p>
+      <div class="bg-red-50 border border-red-200 rounded p-3 mb-4 text-xs text-red-700 font-mono">
+        Estado: Acceso Suspendido
+      </div>
+      <p class="text-xs text-gray-500">
+        Para reactivar su servicio, comuníquese con el administrador del sistema.
+      </p>
+    </div>
+  </div>
 </body>
 </html>
