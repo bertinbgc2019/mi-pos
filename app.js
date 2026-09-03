@@ -1,3 +1,4 @@
+// Base de datos local de ejemplo
 const productosBase = [
   { id: '1', nombre: 'Agua Ciel 1L', precio: 15, codigo: '75010001' },
   { id: '2', nombre: 'Galletas Chokis', precio: 22, codigo: '75010002' },
@@ -7,11 +8,26 @@ const productosBase = [
 
 let carrito = [];
 
+// Inicialización de la aplicación
 document.addEventListener('DOMContentLoaded', () => {
   renderProductos();
   registrarServiceWorker();
+
+  const barcodeInput = document.getElementById('barcode-input');
+  
+  // Coloca el cursor en la caja de texto automáticamente
+  barcodeInput.focus();
+
+  // Captura la tecla Enter que envía el escáner de código de barras
+  barcodeInput.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      buscarProducto();
+    }
+  });
 });
 
+// Renderizar catálogo
 function renderProductos() {
   const grid = document.getElementById('product-grid');
   grid.innerHTML = '';
@@ -26,6 +42,7 @@ function renderProductos() {
   });
 }
 
+// Agregar producto directo por ID
 function agregarAlCarrito(id) {
   const producto = productosBase.find(p => p.id === id);
   if (!producto) return;
@@ -39,19 +56,30 @@ function agregarAlCarrito(id) {
   actualizarCarrito();
 }
 
+// Buscar y agregar por código de barras o por nombre
 function buscarProducto() {
   const input = document.getElementById('barcode-input');
   const valor = input.value.trim();
-  const producto = productosBase.find(p => p.codigo === valor || p.nombre.toLowerCase().includes(valor.toLowerCase()));
+
+  if (!valor) return;
+
+  const producto = productosBase.find(
+    p => p.codigo === valor || p.nombre.toLowerCase().includes(valor.toLowerCase())
+  );
 
   if (producto) {
     agregarAlCarrito(producto.id);
     input.value = '';
   } else {
     alert('Producto no encontrado');
+    input.value = '';
   }
+
+  // Mantiene el cursor en la caja para el siguiente escaneo
+  input.focus();
 }
 
+// Actualizar vista del carrito
 function actualizarCarrito() {
   const container = document.getElementById('cart-items');
   const totalEl = document.getElementById('cart-total');
@@ -80,11 +108,14 @@ function actualizarCarrito() {
   totalEl.innerText = `$${total.toFixed(2)}`;
 }
 
+// Eliminar ítem del carrito
 function eliminarDelCarrito(id) {
   carrito = carrito.filter(item => item.id !== id);
   actualizarCarrito();
+  document.getElementById('barcode-input').focus();
 }
 
+// Guardar la venta en localStorage
 function completarVenta() {
   if (carrito.length === 0) return alert('El carrito está vacío');
 
@@ -99,15 +130,17 @@ function completarVenta() {
   ventasPrevias.push(venta);
   localStorage.setItem('pos_ventas', JSON.stringify(ventasPrevias));
 
-  alert('¡Venta registrada exitosamente!');
+  alert('¡Venta registrada con éxito!');
   carrito = [];
   actualizarCarrito();
+  document.getElementById('barcode-input').focus();
 }
 
+// Registrar el Service Worker para funcionamiento sin conexión
 function registrarServiceWorker() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js')
-      .then(() => console.log('SW listo'))
-      .catch(err => console.error('Error SW:', err));
+      .then(() => console.log('Service Worker listo'))
+      .catch(err => console.error('Error al registrar SW:', err));
   }
 }
