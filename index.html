@@ -10,23 +10,31 @@
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
     .btn-toolbar { background: linear-gradient(to bottom, #ffffff, #e6e6e6); border: 1px solid #adadad; }
     .btn-toolbar:hover { background: linear-gradient(to bottom, #e6e6e6, #cccccc); }
+    .btn-toolbar.active { background: linear-gradient(to bottom, #dbeafe, #bfdbfe); border-color: #3b82f6; font-weight: bold; }
     .btn-action { background: linear-gradient(to bottom, #ffffff, #f0f0f0); border: 1px solid #bcbcbc; }
     .btn-action:hover { background: #e2e8f0; }
     .th-eleventa { background-color: #e4e4e4; border-right: 1px solid #c0c0c0; border-bottom: 1px solid #c0c0c0; }
+    .subnav-btn { background: linear-gradient(to bottom, #ffffff, #f1f5f9); border: 1px solid #cbd5e1; }
+    .subnav-btn:hover { background: #e2e8f0; }
+    .subnav-btn.active { background: #ffffff; border-bottom: 2px solid #d97706; font-weight: bold; }
   </style>
 </head>
 <body class="bg-[#f0f0f0] text-gray-800 h-screen flex flex-col justify-between overflow-hidden text-xs">
 
-  <!-- 1. Encabezado Superior (Barra de Navegación) -->
+  <!-- 1. Encabezado Superior (Barra de Navegación Global) -->
   <header class="bg-[#f5f5f5] border-b border-gray-300 p-1 flex justify-between items-center">
     <div class="flex items-center gap-1 overflow-x-auto">
       <div class="flex items-center gap-1 font-bold text-base px-2 text-blue-900 border-r border-gray-300 pr-3">
         <span class="text-xl">🖥️</span> eleventa<span class="text-xs align-super">®</span>
       </div>
-      <button class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 font-semibold text-gray-700 shadow-sm"><span class="text-blue-600">🏷️ F1</span> Ventas</button>
+      <button id="nav-ventas" onclick="cambiarModulo('ventas')" class="btn-toolbar active px-2 py-1 rounded flex items-center gap-1 text-gray-700 shadow-sm">
+        <span class="text-blue-600">🏷️ F1</span> Ventas
+      </button>
       <button class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600"><span class="text-blue-600">💸 F2</span> Créditos</button>
       <button class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600"><span class="text-blue-600">👥</span> Clientes</button>
-      <button class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600"><span class="text-blue-600">📦 F3</span> Productos</button>
+      <button id="nav-productos" onclick="cambiarModulo('productos')" class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600">
+        <span class="text-blue-600">📦 F3</span> Productos
+      </button>
       <button class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600"><span class="text-blue-600">📋 F4</span> Inventario</button>
       <button class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600"><span class="text-blue-600">🚚</span> Compras</button>
       <button class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600"><span class="text-blue-600">⚙️</span> Configuración</button>
@@ -38,91 +46,252 @@
     </div>
   </header>
 
-  <!-- 2. Banner de Módulo -->
-  <div class="bg-[#2c5282] text-white px-3 py-1 font-bold text-sm shadow-inner flex justify-between items-center">
-    <span>VENTA - Ticket 1</span>
-  </div>
-
-  <!-- 3. Sub-barra de Acciones de Entrada -->
-  <div class="bg-[#f0f0f0] p-1.5 border-b border-gray-300 flex items-center gap-2">
-    <span class="font-semibold text-gray-700">Código del Producto:</span>
-    <input type="text" id="barcode-input" autofocus class="border border-gray-400 p-1 rounded w-64 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white shadow-inner">
+  <!-- ==================== MÓDULO 1: VENTAS ==================== -->
+  <div id="modulo-ventas" class="flex-1 flex flex-col justify-between overflow-hidden">
     
-    <button onclick="buscarProducto()" class="btn-action px-2 py-1 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm">
-      <span>🛒</span> ENTER - Agregar Producto
-    </button>
-    <button onclick="buscarProductoPrompt()" class="btn-action px-2 py-1 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm">
-      <span class="text-blue-600">🔍 F10</span> Buscar
-    </button>
-    <button onclick="eliminarSeleccionado()" class="btn-action px-2 py-1 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm">
-      <span class="text-red-600">🗑️ DEL</span> Borrar Art.
-    </button>
-  </div>
-
-  <!-- 4. Pestañas de Tickets -->
-  <div class="bg-[#d6d6d6] px-2 pt-1 flex items-center gap-1 border-b border-gray-400">
-    <div class="bg-white border-t-2 border-t-blue-600 border-x border-gray-400 px-3 py-1 font-bold rounded-t text-gray-800 flex items-center gap-1 shadow">
-      📄 Ticket 1
-    </div>
-  </div>
-
-  <!-- 5. Tabla Principal de Artículos -->
-  <main class="flex-1 bg-white overflow-y-auto">
-    <table class="w-full text-left border-collapse">
-      <thead>
-        <tr class="text-gray-700 font-semibold text-xs border-b border-gray-300">
-          <th class="th-eleventa p-1.5 w-32">Código de Barras</th>
-          <th class="th-eleventa p-1.5">Descripción del Producto</th>
-          <th class="th-eleventa p-1.5 text-right w-24">Precio Venta</th>
-          <th class="th-eleventa p-1.5 text-center w-20">Cant.</th>
-          <th class="th-eleventa p-1.5 text-right w-24 bg-[#eaf4ea]">Importe</th>
-          <th class="th-eleventa p-1.5 text-center w-24">Existencia</th>
-        </tr>
-      </thead>
-      <tbody id="cart-rows" class="divide-y divide-gray-200">
-        <!-- Los productos en el ticket se generan dinámicamente -->
-      </tbody>
-    </table>
-  </main>
-
-  <!-- 6. Resumen de Conteo -->
-  <div class="bg-[#f0f0f0] px-3 py-1 border-t border-gray-300 text-gray-600 font-semibold">
-    <span id="items-count">0</span> Productos en la venta actual.
-  </div>
-
-  <!-- 7. Panel Inferior de Cobro -->
-  <footer class="bg-[#e6e6e6] border-t border-gray-400 p-2 grid grid-cols-1 md:grid-cols-3 gap-2 items-center">
-    
-    <!-- Controles Izquierda -->
-    <div class="flex flex-col gap-1">
-      <div class="flex gap-1">
-        <button onclick="eliminarSeleccionado()" class="btn-action px-2 py-1 rounded text-gray-700 font-bold flex-1">Eliminar</button>
-        <button class="btn-action px-2 py-1 rounded text-gray-700 font-bold flex-1">👤 Asignar cliente</button>
-      </div>
-      <div class="flex gap-4 text-xs mt-1 bg-white p-1 rounded border border-gray-300">
-        <div><span class="text-gray-500">Total:</span> <strong id="summary-total" class="text-blue-800">$0.00</strong></div>
-        <div><span class="text-gray-500">Pagó Con:</span> <strong id="summary-pay" class="text-blue-800">$0.00</strong></div>
-        <div><span class="text-gray-500">Cambio:</span> <strong id="summary-change" class="text-blue-800">$0.00</strong></div>
-      </div>
+    <!-- Banner de Módulo Ventas -->
+    <div class="bg-[#2c5282] text-white px-3 py-1 font-bold text-sm shadow-inner flex justify-between items-center">
+      <span>VENTA - Ticket 1</span>
     </div>
 
-    <!-- Botón Cobrar Centro -->
-    <div class="flex flex-col gap-1 justify-center items-center">
-      <button onclick="completarVenta()" class="btn-action bg-white border border-gray-400 text-blue-900 font-bold text-sm px-6 py-2 rounded shadow flex items-center gap-2 hover:bg-blue-50 w-full justify-center">
-        🛒 F12 - Cobrar
+    <!-- Sub-barra de Acciones -->
+    <div class="bg-[#f0f0f0] p-1.5 border-b border-gray-300 flex items-center gap-2">
+      <span class="font-semibold text-gray-700">Código del Producto:</span>
+      <input type="text" id="barcode-input" autofocus class="border border-gray-400 p-1 rounded w-64 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white shadow-inner">
+      
+      <button onclick="buscarProducto()" class="btn-action px-2 py-1 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm">
+        <span>🛒</span> ENTER - Agregar Producto
       </button>
-      <button onclick="reimprimirUltimoTicket()" class="btn-action text-gray-700 text-xs px-3 py-1 rounded w-full">
-        🖨️ Reimprimir Último Ticket
+      <button onclick="buscarProductoPrompt()" class="btn-action px-2 py-1 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm">
+        <span class="text-blue-600">🔍 F10</span> Buscar
+      </button>
+      <button onclick="eliminarSeleccionado()" class="btn-action px-2 py-1 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm">
+        <span class="text-red-600">🗑️ DEL</span> Borrar Art.
       </button>
     </div>
 
-    <!-- Display Gigante del Total -->
-    <div class="bg-[#f8fafc] border border-gray-300 rounded p-2 text-right shadow-inner flex flex-col justify-center">
-      <span class="text-gray-500 text-[10px] uppercase font-bold tracking-wider">Total a Cobrar</span>
-      <span id="cart-total" class="text-4xl font-bold text-[#1e3a8a] font-mono tracking-tight">$0.00</span>
+    <!-- Pestañas de Tickets -->
+    <div class="bg-[#d6d6d6] px-2 pt-1 flex items-center gap-1 border-b border-gray-400">
+      <div class="bg-white border-t-2 border-t-blue-600 border-x border-gray-400 px-3 py-1 font-bold rounded-t text-gray-800 flex items-center gap-1 shadow">
+        📄 Ticket 1
+      </div>
     </div>
 
-  </footer>
+    <!-- Tabla Principal de Artículos -->
+    <main class="flex-1 bg-white overflow-y-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="text-gray-700 font-semibold text-xs border-b border-gray-300">
+            <th class="th-eleventa p-1.5 w-32">Código de Barras</th>
+            <th class="th-eleventa p-1.5">Descripción del Producto</th>
+            <th class="th-eleventa p-1.5 text-right w-24">Precio Venta</th>
+            <th class="th-eleventa p-1.5 text-center w-20">Cant.</th>
+            <th class="th-eleventa p-1.5 text-right w-24 bg-[#eaf4ea]">Importe</th>
+            <th class="th-eleventa p-1.5 text-center w-24">Existencia</th>
+          </tr>
+        </thead>
+        <tbody id="cart-rows" class="divide-y divide-gray-200">
+          <!-- Se genera dinámicamente -->
+        </tbody>
+      </table>
+    </main>
+
+    <!-- Resumen de Conteo -->
+    <div class="bg-[#f0f0f0] px-3 py-1 border-t border-gray-300 text-gray-600 font-semibold">
+      <span id="items-count">0</span> Productos en la venta actual.
+    </div>
+
+    <!-- Panel Inferior de Cobro -->
+    <footer class="bg-[#e6e6e6] border-t border-gray-400 p-2 grid grid-cols-1 md:grid-cols-3 gap-2 items-center">
+      <div class="flex flex-col gap-1">
+        <div class="flex gap-1">
+          <button onclick="eliminarSeleccionado()" class="btn-action px-2 py-1 rounded text-gray-700 font-bold flex-1">Eliminar</button>
+          <button class="btn-action px-2 py-1 rounded text-gray-700 font-bold flex-1">👤 Asignar cliente</button>
+        </div>
+        <div class="flex gap-4 text-xs mt-1 bg-white p-1 rounded border border-gray-300">
+          <div><span class="text-gray-500">Total:</span> <strong id="summary-total" class="text-blue-800">$0.00</strong></div>
+          <div><span class="text-gray-500">Pagó Con:</span> <strong id="summary-pay" class="text-blue-800">$0.00</strong></div>
+          <div><span class="text-gray-500">Cambio:</span> <strong id="summary-change" class="text-blue-800">$0.00</strong></div>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1 justify-center items-center">
+        <button onclick="completarVenta()" class="btn-action bg-white border border-gray-400 text-blue-900 font-bold text-sm px-6 py-2 rounded shadow flex items-center gap-2 hover:bg-blue-50 w-full justify-center">
+          🛒 F12 - Cobrar
+        </button>
+        <button onclick="reimprimirUltimoTicket()" class="btn-action text-gray-700 text-xs px-3 py-1 rounded w-full">
+          🖨️ Reimprimir Último Ticket
+        </button>
+      </div>
+
+      <div class="bg-[#f8fafc] border border-gray-300 rounded p-2 text-right shadow-inner flex flex-col justify-center">
+        <span class="text-gray-500 text-[10px] uppercase font-bold tracking-wider">Total a Cobrar</span>
+        <span id="cart-total" class="text-4xl font-bold text-[#1e3a8a] font-mono tracking-tight">$0.00</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ==================== MÓDULO 2: PRODUCTOS ==================== -->
+  <div id="modulo-productos" class="flex-1 flex flex-col justify-between overflow-hidden hidden">
+    
+    <!-- Banner Dorado de Productos -->
+    <div class="bg-[#c28e2b] text-white px-3 py-1 font-bold text-sm shadow-inner">
+      PRODUCTOS
+    </div>
+
+    <!-- Sub-barra de Navegación de Productos -->
+    <div class="bg-[#f0f0f0] p-1 border-b border-gray-300 flex items-center gap-1">
+      <button class="subnav-btn active px-3 py-1 rounded flex items-center gap-1 text-green-700 font-bold">
+        <span class="text-green-600">➕</span> Nuevo
+      </button>
+      <button class="subnav-btn px-3 py-1 rounded flex items-center gap-1 text-gray-700">
+        <span class="text-yellow-600">✏️</span> Modificar
+      </button>
+      <button class="subnav-btn px-3 py-1 rounded flex items-center gap-1 text-gray-700">
+        <span class="text-red-600">❌</span> Eliminar
+      </button>
+      <button class="subnav-btn px-3 py-1 rounded flex items-center gap-1 text-gray-700">
+        <span class="text-blue-600">🗂️</span> Departamentos
+      </button>
+      <button class="subnav-btn px-3 py-1 rounded flex items-center gap-1 text-gray-700">
+        <span class="text-purple-600">📅</span> Ventas por Periodo
+      </button>
+      <button class="subnav-btn px-3 py-1 rounded flex items-center gap-1 text-gray-700">
+        <span class="text-amber-500">⭐</span> Promociones
+      </button>
+      <button class="subnav-btn px-3 py-1 rounded flex items-center gap-1 text-gray-700">
+        <span class="text-teal-600">📥</span> Importar
+      </button>
+      <button class="subnav-btn px-3 py-1 rounded flex items-center gap-1 text-gray-700">
+        <span class="text-indigo-600">📖</span> Catálogo
+      </button>
+    </div>
+
+    <!-- Título de Acción -->
+    <div class="px-4 pt-2 text-[#d97706] font-bold text-base border-b border-gray-200 pb-1">
+      NUEVO / MODIFICAR PRODUCTO
+    </div>
+
+    <!-- Formularios y Contenido de Producto -->
+    <main class="flex-1 bg-white p-4 overflow-y-auto text-gray-800">
+      
+      <form id="form-producto" onsubmit="guardarNuevoProducto(event)" class="max-w-4xl space-y-3">
+        
+        <!-- Código del Producto -->
+        <div class="flex items-center gap-3">
+          <label class="w-32 text-right font-semibold">Nuevo Código:</label>
+          <input type="text" id="prod-codigo" required placeholder="Ingresa o busca un Código de Barras" class="border border-gray-400 p-1 rounded w-80 font-mono text-sm focus:ring-1 focus:ring-amber-500 outline-none">
+        </div>
+
+        <!-- Descripción -->
+        <div class="flex items-center gap-3">
+          <label class="w-32 text-right font-semibold">Descripción:</label>
+          <input type="text" id="prod-nombre" required class="border border-gray-400 p-1 rounded w-96 text-sm focus:ring-1 focus:ring-amber-500 outline-none">
+        </div>
+
+        <!-- Tipo de Venta -->
+        <div class="flex items-center gap-3">
+          <label class="w-32 text-right font-semibold">Se vende:</label>
+          <div class="flex items-center gap-4 text-xs">
+            <label class="flex items-center gap-1 cursor-pointer">
+              <input type="radio" name="tipo_venta" value="Unidad" checked> Por Unidad/Pza
+            </label>
+            <label class="flex items-center gap-1 cursor-pointer">
+              <input type="radio" name="tipo_venta" value="Granel"> A Granel (Usa Decimales)
+            </label>
+            <label class="flex items-center gap-1 cursor-pointer">
+              <input type="radio" name="tipo_venta" value="Kit"> Como paquete (kit)
+            </label>
+          </div>
+        </div>
+
+        <!-- Precios y Ganancia -->
+        <div class="flex items-center gap-3">
+          <label class="w-32 text-right font-semibold">Precio Costo:</label>
+          <input type="number" step="0.01" id="prod-costo" oninput="calcularPrecioVenta()" placeholder="0.00" class="border border-gray-400 p-1 rounded w-32 font-mono outline-none">
+        </div>
+
+        <div class="flex items-center gap-3">
+          <label class="w-32 text-right font-semibold">Ganancia:</label>
+          <div class="flex items-center gap-1">
+            <input type="number" step="0.01" id="prod-ganancia" oninput="calcularPrecioVenta()" placeholder="0" class="border border-gray-400 p-1 rounded w-20 font-mono outline-none">
+            <span class="font-bold text-gray-600">%</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <label class="w-32 text-right font-semibold">Precio Venta:</label>
+          <input type="number" step="0.01" id="prod-precio" required placeholder="0.00" class="border border-gray-400 p-1 rounded w-32 font-mono font-bold text-blue-900 outline-none">
+        </div>
+
+        <div class="flex items-center gap-3">
+          <label class="w-32 text-right font-semibold">Precio Mayoreo:</label>
+          <input type="number" step="0.01" id="prod-mayoreo" placeholder="0.00" class="border border-gray-400 p-1 rounded w-32 font-mono outline-none">
+        </div>
+
+        <!-- Departamento -->
+        <div class="flex items-center gap-3">
+          <label class="w-32 text-right font-semibold">Departamento:</label>
+          <select id="prod-depto" class="border border-gray-400 p-1 rounded w-64 bg-white outline-none">
+            <option value="- Sin Departamento -">- Sin Departamento -</option>
+            <option value="Abarrotes">Abarrotes</option>
+            <option value="Bebidas">Bebidas</option>
+            <option value="Papelería">Papelería</option>
+          </select>
+        </div>
+
+        <!-- Sección de Inventario -->
+        <div class="mt-4 pt-3 border-t border-gray-200 flex gap-4">
+          <div class="w-4 bg-amber-400 flex items-center justify-center font-bold text-[10px] text-amber-900 py-6 write-vertical">
+            INVENTARIO
+          </div>
+
+          <div class="space-y-2">
+            <div>
+              <label class="flex items-center gap-2 cursor-pointer font-semibold">
+                <input type="checkbox" id="prod-usa-inv" checked onchange="toggleInventarioInputs(this.checked)">
+                Este producto SI utiliza inventario.
+              </label>
+            </div>
+
+            <div id="inv-inputs" class="space-y-2 pl-4">
+              <div class="flex items-center gap-2">
+                <span>Hay</span>
+                <input type="number" id="prod-stock" value="10" class="border border-gray-400 p-1 rounded w-20 text-center font-bold font-mono">
+                <span>en este momento.</span>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <span class="w-12 text-right">Mínimo:</span>
+                <input type="number" id="prod-min" value="2" class="border border-gray-400 p-1 rounded w-20 text-center font-mono">
+              </div>
+
+              <div class="flex items-center gap-2">
+                <span class="w-12 text-right">Máximo:</span>
+                <input type="number" id="prod-max" value="50" class="border border-gray-400 p-1 rounded w-20 text-center font-mono">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" id="btn-submit-hidden" class="hidden"></button>
+      </form>
+
+    </main>
+
+    <!-- Botones Inferiores de Acción -->
+    <footer class="bg-[#f0f0f0] border-t border-gray-300 p-2 flex justify-between items-center px-4">
+      <button onclick="document.getElementById('form-producto').requestSubmit()" class="btn-action bg-white px-4 py-1.5 rounded text-green-800 font-bold flex items-center gap-1 shadow hover:bg-green-50 border-green-300">
+        <span>✅</span> Guardar Producto
+      </button>
+
+      <button onclick="limpiarFormularioProducto()" class="btn-action bg-white px-4 py-1.5 rounded text-red-700 font-bold flex items-center gap-1 shadow hover:bg-red-50 border-red-300">
+        <span>❌</span> Cancelar
+      </button>
+    </footer>
+
+  </div>
 
   <!-- 8. Barra de Estado Inferior -->
   <div class="bg-[#ffffcc] border-t border-gray-300 px-3 py-0.5 text-[11px] text-gray-700 flex justify-between items-center">
