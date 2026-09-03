@@ -297,3 +297,44 @@ function registrarServiceWorker() {
     navigator.serviceWorker.register('sw.js').catch(err => console.error(err));
   }
 }
+// CONFIGURACIÓN DE MEMBRESÍA (Año-Mes-Día)
+// Cambia esta fecha al día límite que haya pagado tu cliente:
+const FECHA_VENCIMIENTO_LICENCIA = "2026-09-30"; 
+
+async function verificarEstadoMembresia() {
+  let fechaActual;
+
+  try {
+    // Intenta obtener la fecha real desde internet para evitar trampas con el reloj de la PC
+    const res = await fetch('https://worldtimeapi.org/api/ip', { cache: "no-store" });
+    const data = await res.json();
+    fechaActual = new Date(data.datetime);
+  } catch (err) {
+    // Si está offline, usa la fecha de la máquina
+    fechaActual = new Date();
+  }
+
+  const fechaLimite = new Date(FECHA_VENCIMIENTO_LICENCIA + "T23:59:59");
+
+  // Comparar fechas
+  if (fechaActual > fechaLimite) {
+    bloquearSistema();
+  }
+}
+
+function bloquearSistema() {
+  const modal = document.getElementById('modal-licencia-bloqueo');
+  if (modal) {
+    modal.classList.remove('hidden');
+  }
+  // Deshabilitar atajos de teclado
+  document.onkeydown = (e) => {
+    e.stopPropagation();
+    return false;
+  };
+}
+
+// Ejecutar la verificación al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+  verificarEstadoMembresia();
+});
