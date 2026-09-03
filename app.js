@@ -1,304 +1,299 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>eleventa POS - PWA</title>
-  <link rel="manifest" href="manifest.json">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
-    .btn-toolbar { background: linear-gradient(to bottom, #ffffff, #e6e6e6); border: 1px solid #adadad; }
-    .btn-toolbar:hover { background: linear-gradient(to bottom, #e6e6e6, #cccccc); }
-    .btn-toolbar.active { background: linear-gradient(to bottom, #dbeafe, #bfdbfe); border-color: #3b82f6; font-weight: bold; }
-    .btn-action { background: linear-gradient(to bottom, #ffffff, #f0f0f0); border: 1px solid #bcbcbc; }
-    .btn-action:hover { background: #e2e8f0; }
-    .th-eleventa { background-color: #e4e4e4; border-right: 1px solid #c0c0c0; border-bottom: 1px solid #c0c0c0; }
-    .subnav-btn { background: linear-gradient(to bottom, #ffffff, #f1f5f9); border: 1px solid #cbd5e1; }
-    .subnav-btn:hover { background: #e2e8f0; }
-    .subnav-btn.active { background: #ffffff; border-bottom: 2px solid #d97706; font-weight: bold; }
-  </style>
-</head>
-<body class="bg-[#f0f0f0] text-gray-800 h-screen flex flex-col justify-between overflow-hidden text-xs">
+// Base inicial de productos si no hay nada en localStorage
+const productosDefault = [
+  { id: '1', codigo: '75010001', nombre: 'Agua Ciel 1L', precio: 15.00, stock: 45, costo: 10.00 },
+  { id: '2', codigo: '75010002', nombre: 'Galletas Chokis', precio: 22.00, stock: 18, costo: 16.00 },
+  { id: '3', codigo: '75010003', nombre: 'Refresco Coca-Cola 600ml', precio: 18.00, stock: 30, costo: 13.00 },
+  { id: '4', codigo: '75010004', nombre: 'Cuaderno Profesional', precio: 35.00, stock: 12, costo: 25.00 }
+];
 
-  <!-- 1. Encabezado Superior (Barra de Navegación Global) -->
-  <header class="bg-[#f5f5f5] border-b border-gray-300 p-1 flex justify-between items-center">
-    <div class="flex items-center gap-1 overflow-x-auto">
-      <div class="flex items-center gap-1 font-bold text-base px-2 text-blue-900 border-r border-gray-300 pr-3">
-        <span class="text-xl">🖥️</span> eleventa<span class="text-xs align-super">®</span>
-      </div>
-      <button id="nav-ventas" onclick="cambiarModulo('ventas')" class="btn-toolbar active px-2 py-1 rounded flex items-center gap-1 text-gray-700 shadow-sm cursor-pointer">
-        <span class="text-blue-600">🏷️ F1</span> Ventas
-      </button>
-      <button class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600"><span class="text-blue-600">💸 F2</span> Créditos</button>
-      <button class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600"><span class="text-blue-600">👥</span> Clientes</button>
-      <button id="nav-productos" onclick="cambiarModulo('productos')" class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600 cursor-pointer">
-        <span class="text-blue-600">📦 F3</span> Productos
-      </button>
-      <button class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600"><span class="text-blue-600">📋 F4</span> Inventario</button>
-      <button class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600"><span class="text-blue-600">🚚</span> Compras</button>
-      <button class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600"><span class="text-blue-600">⚙️</span> Configuración</button>
-      <button class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600"><span class="text-blue-600">📊</span> Reportes</button>
-    </div>
-    <div class="text-right pl-2 pr-2">
-      <div class="text-[10px] text-gray-500 font-bold">Le atiende:</div>
-      <div class="font-bold text-gray-800 text-sm">BERTIN GARCIA CRUZ</div>
-    </div>
-  </header>
+// Obtener catálogo almacenado
+function obtenerProductosDB() {
+  const db = localStorage.getItem('eleventa_productos');
+  if (!db) {
+    localStorage.setItem('eleventa_productos', JSON.stringify(productosDefault));
+    return productosDefault;
+  }
+  return JSON.parse(db);
+}
 
-  <!-- ==================== MÓDULO 1: VENTAS ==================== -->
-  <div id="modulo-ventas" class="flex-1 flex flex-col justify-between overflow-hidden">
-    
-    <!-- Banner de Módulo Ventas -->
-    <div class="bg-[#2c5282] text-white px-3 py-1 font-bold text-sm shadow-inner flex justify-between items-center">
-      <span>VENTA - Ticket 1</span>
-    </div>
+let productosBase = obtenerProductosDB();
+let carrito = [];
+let itemSeleccionadoIndex = null;
 
-    <!-- Sub-barra de Acciones -->
-    <div class="bg-[#f0f0f0] p-1.5 border-b border-gray-300 flex items-center gap-2">
-      <span class="font-semibold text-gray-700">Código del Producto:</span>
-      <input type="text" id="barcode-input" autofocus class="border border-gray-400 p-1 rounded w-64 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white shadow-inner">
-      
-      <button onclick="buscarProducto()" class="btn-action px-2 py-1 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm">
-        <span>🛒</span> ENTER - Agregar Producto
-      </button>
-      <button onclick="buscarProductoPrompt()" class="btn-action px-2 py-1 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm">
-        <span class="text-blue-600">🔍 F10</span> Buscar
-      </button>
-      <button onclick="eliminarSeleccionado()" class="btn-action px-2 py-1 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm">
-        <span class="text-red-600">🗑️ DEL</span> Borrar Art.
-      </button>
-    </div>
+document.addEventListener('DOMContentLoaded', () => {
+  registrarServiceWorker();
+  iniciarReloj();
 
-    <!-- Pestañas de Tickets -->
-    <div class="bg-[#d6d6d6] px-2 pt-1 flex items-center gap-1 border-b border-gray-400">
-      <div class="bg-white border-t-2 border-t-blue-600 border-x border-gray-400 px-3 py-1 font-bold rounded-t text-gray-800 flex items-center gap-1 shadow">
-        📄 Ticket 1
-      </div>
-    </div>
+  const barcodeInput = document.getElementById('barcode-input');
+  if (barcodeInput) barcodeInput.focus();
 
-    <!-- Tabla Principal de Artículos -->
-    <main class="flex-1 bg-white overflow-y-auto">
-      <table class="w-full text-left border-collapse">
-        <thead>
-          <tr class="text-gray-700 font-semibold text-xs border-b border-gray-300">
-            <th class="th-eleventa p-1.5 w-32">Código de Barras</th>
-            <th class="th-eleventa p-1.5">Descripción del Producto</th>
-            <th class="th-eleventa p-1.5 text-right w-24">Precio Venta</th>
-            <th class="th-eleventa p-1.5 text-center w-20">Cant.</th>
-            <th class="th-eleventa p-1.5 text-right w-24 bg-[#eaf4ea]">Importe</th>
-            <th class="th-eleventa p-1.5 text-center w-24">Existencia</th>
-          </tr>
-        </thead>
-        <tbody id="cart-rows" class="divide-y divide-gray-200">
-          <!-- Se genera dinámicamente -->
-        </tbody>
-      </table>
-    </main>
+  // Escaneo automático con Enter
+  if (barcodeInput) {
+    barcodeInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        buscarProducto();
+      }
+    });
+  }
 
-    <!-- Resumen de Conteo -->
-    <div class="bg-[#f0f0f0] px-3 py-1 border-t border-gray-300 text-gray-600 font-semibold">
-      <span id="items-count">0</span> Productos en la venta actual.
-    </div>
+  // Atajos de teclado estilo eleventa (F1, F3, F10, F12, Supr)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'F1') {
+      e.preventDefault();
+      cambiarModulo('ventas');
+    } else if (e.key === 'F3') {
+      e.preventDefault();
+      cambiarModulo('productos');
+    } else if (e.key === 'F12') {
+      e.preventDefault();
+      completarVenta();
+    } else if (e.key === 'F10') {
+      e.preventDefault();
+      buscarProductoPrompt();
+    } else if (e.key === 'Delete') {
+      eliminarSeleccionado();
+    }
+  });
+});
 
-    <!-- Panel Inferior de Cobro -->
-    <footer class="bg-[#e6e6e6] border-t border-gray-400 p-2 grid grid-cols-1 md:grid-cols-3 gap-2 items-center">
-      <div class="flex flex-col gap-1">
-        <div class="flex gap-1">
-          <button onclick="eliminarSeleccionado()" class="btn-action px-2 py-1 rounded text-gray-700 font-bold flex-1">Eliminar</button>
-          <button class="btn-action px-2 py-1 rounded text-gray-700 font-bold flex-1">👤 Asignar cliente</button>
-        </div>
-        <div class="flex gap-4 text-xs mt-1 bg-white p-1 rounded border border-gray-300">
-          <div><span class="text-gray-500">Total:</span> <strong id="summary-total" class="text-blue-800">$0.00</strong></div>
-          <div><span class="text-gray-500">Pagó Con:</span> <strong id="summary-pay" class="text-blue-800">$0.00</strong></div>
-          <div><span class="text-gray-500">Cambio:</span> <strong id="summary-change" class="text-blue-800">$0.00</strong></div>
-        </div>
-      </div>
+// Navegación entre Módulos Ventas (F1) y Productos (F3)
+function cambiarModulo(modulo) {
+  const modVentas = document.getElementById('modulo-ventas');
+  const modProductos = document.getElementById('modulo-productos');
+  const btnVentas = document.getElementById('nav-ventas');
+  const btnProductos = document.getElementById('nav-productos');
 
-      <div class="flex flex-col gap-1 justify-center items-center">
-        <button onclick="completarVenta()" class="btn-action bg-white border border-gray-400 text-blue-900 font-bold text-sm px-6 py-2 rounded shadow flex items-center gap-2 hover:bg-blue-50 w-full justify-center">
-          🛒 F12 - Cobrar
-        </button>
-        <button onclick="reimprimirUltimoTicket()" class="btn-action text-gray-700 text-xs px-3 py-1 rounded w-full">
-          🖨️ Reimprimir Último Ticket
-        </button>
-      </div>
+  if (modulo === 'ventas') {
+    modVentas.classList.remove('hidden');
+    modProductos.classList.add('hidden');
+    btnVentas.classList.add('active');
+    btnProductos.classList.remove('active');
+    document.getElementById('barcode-input').focus();
+  } else if (modulo === 'productos') {
+    modVentas.classList.add('hidden');
+    modProductos.classList.remove('hidden');
+    btnVentas.classList.remove('active');
+    btnProductos.classList.add('active');
+    document.getElementById('prod-codigo').focus();
+  }
+}
 
-      <div class="bg-[#f8fafc] border border-gray-300 rounded p-2 text-right shadow-inner flex flex-col justify-center">
-        <span class="text-gray-500 text-[10px] uppercase font-bold tracking-wider">Total a Cobrar</span>
-        <span id="cart-total" class="text-4xl font-bold text-[#1e3a8a] font-mono tracking-tight">$0.00</span>
-      </div>
-    </footer>
+// Ventas y Carrito
+function buscarProducto() {
+  const input = document.getElementById('barcode-input');
+  const valor = input.value.trim();
+  if (!valor) return;
 
-  </div>
+  productosBase = obtenerProductosDB(); // Actualizar productos
+  const producto = productosBase.find(
+    p => p.codigo === valor || p.nombre.toLowerCase().includes(valor.toLowerCase())
+  );
 
-  <!-- ==================== MÓDULO 2: PRODUCTOS ==================== -->
-  <div id="modulo-productos" class="flex-1 flex flex-col justify-between overflow-hidden hidden">
-    
-    <!-- Banner Dorado de Productos -->
-    <div class="bg-[#c28e2b] text-white px-3 py-1 font-bold text-sm shadow-inner">
-      PRODUCTOS
-    </div>
+  if (producto) {
+    agregarAlCarrito(producto);
+    input.value = '';
+  } else {
+    alert('El producto no existe en el catálogo.');
+    input.value = '';
+  }
+  input.focus();
+}
 
-    <!-- Sub-barra de Navegación de Productos -->
-    <div class="bg-[#f0f0f0] p-1 border-b border-gray-300 flex items-center gap-1 overflow-x-auto">
-      <button class="subnav-btn active px-3 py-1 rounded flex items-center gap-1 text-green-700 font-bold">
-        <span class="text-green-600">➕</span> Nuevo
-      </button>
-      <button class="subnav-btn px-3 py-1 rounded flex items-center gap-1 text-gray-700">
-        <span class="text-yellow-600">✏️</span> Modificar
-      </button>
-      <button class="subnav-btn px-3 py-1 rounded flex items-center gap-1 text-gray-700">
-        <span class="text-red-600">❌</span> Eliminar
-      </button>
-      <button class="subnav-btn px-3 py-1 rounded flex items-center gap-1 text-gray-700">
-        <span class="text-blue-600">🗂️</span> Departamentos
-      </button>
-      <button class="subnav-btn px-3 py-1 rounded flex items-center gap-1 text-gray-700">
-        <span class="text-purple-600">📅</span> Ventas por Periodo
-      </button>
-      <button class="subnav-btn px-3 py-1 rounded flex items-center gap-1 text-gray-700">
-        <span class="text-amber-500">⭐</span> Promociones
-      </button>
-      <button class="subnav-btn px-3 py-1 rounded flex items-center gap-1 text-gray-700">
-        <span class="text-teal-600">📥</span> Importar
-      </button>
-      <button class="subnav-btn px-3 py-1 rounded flex items-center gap-1 text-gray-700">
-        <span class="text-indigo-600">📖</span> Catálogo
-      </button>
-    </div>
+function buscarProductoPrompt() {
+  const busqueda = prompt('Teclee el nombre o código del producto a buscar:');
+  if (busqueda) {
+    document.getElementById('barcode-input').value = busqueda;
+    buscarProducto();
+  }
+}
 
-    <!-- Título de Acción -->
-    <div class="px-4 pt-2 text-[#d97706] font-bold text-base border-b border-gray-200 pb-1">
-      NUEVO / MODIFICAR PRODUCTO
-    </div>
+function agregarAlCarrito(producto) {
+  const item = carrito.find(i => i.id === producto.id);
+  if (item) {
+    item.cantidad++;
+  } else {
+    carrito.push({ ...producto, cantidad: 1 });
+  }
+  actualizarTabla();
+}
 
-    <!-- Formularios y Contenido de Producto -->
-    <main class="flex-1 bg-white p-4 overflow-y-auto text-gray-800">
-      
-      <form id="form-producto" onsubmit="guardarNuevoProducto(event)" class="max-w-4xl space-y-3">
-        
-        <!-- Código del Producto -->
-        <div class="flex items-center gap-3">
-          <label class="w-32 text-right font-semibold">Nuevo Código:</label>
-          <input type="text" id="prod-codigo" required placeholder="Ingresa o busca un Código de Barras" class="border border-gray-400 p-1 rounded w-80 font-mono text-sm focus:ring-1 focus:ring-amber-500 outline-none">
-        </div>
+function seleccionarFila(index) {
+  itemSeleccionadoIndex = index;
+  actualizarTabla();
+}
 
-        <!-- Descripción -->
-        <div class="flex items-center gap-3">
-          <label class="w-32 text-right font-semibold">Descripción:</label>
-          <input type="text" id="prod-nombre" required class="border border-gray-400 p-1 rounded w-96 text-sm focus:ring-1 focus:ring-amber-500 outline-none">
-        </div>
+function actualizarTabla() {
+  const tbody = document.getElementById('cart-rows');
+  tbody.innerHTML = '';
 
-        <!-- Tipo de Venta -->
-        <div class="flex items-center gap-3">
-          <label class="w-32 text-right font-semibold">Se vende:</label>
-          <div class="flex items-center gap-4 text-xs">
-            <label class="flex items-center gap-1 cursor-pointer">
-              <input type="radio" name="tipo_venta" value="Unidad" checked> Por Unidad/Pza
-            </label>
-            <label class="flex items-center gap-1 cursor-pointer">
-              <input type="radio" name="tipo_venta" value="Granel"> A Granel (Usa Decimales)
-            </label>
-            <label class="flex items-center gap-1 cursor-pointer">
-              <input type="radio" name="tipo_venta" value="Kit"> Como paquete (kit)
-            </label>
-          </div>
-        </div>
+  let total = 0;
+  let totalArticulos = 0;
 
-        <!-- Precios y Ganancia -->
-        <div class="flex items-center gap-3">
-          <label class="w-32 text-right font-semibold">Precio Costo:</label>
-          <input type="number" step="0.01" id="prod-costo" oninput="calcularPrecioVenta()" placeholder="0.00" class="border border-gray-400 p-1 rounded w-32 font-mono outline-none">
-        </div>
+  carrito.forEach((item, index) => {
+    const importe = item.precio * item.cantidad;
+    total += importe;
+    totalArticulos += item.cantidad;
 
-        <div class="flex items-center gap-3">
-          <label class="w-32 text-right font-semibold">Ganancia:</label>
-          <div class="flex items-center gap-1">
-            <input type="number" step="0.01" id="prod-ganancia" oninput="calcularPrecioVenta()" placeholder="0" class="border border-gray-400 p-1 rounded w-20 font-mono outline-none">
-            <span class="font-bold text-gray-600">%</span>
-          </div>
-        </div>
+    const isSelected = itemSeleccionadoIndex === index;
+    const rowClass = isSelected ? 'bg-blue-100 font-semibold' : 'hover:bg-gray-50';
 
-        <div class="flex items-center gap-3">
-          <label class="w-32 text-right font-semibold">Precio Venta:</label>
-          <input type="number" step="0.01" id="prod-precio" required placeholder="0.00" class="border border-gray-400 p-1 rounded w-32 font-mono font-bold text-blue-900 outline-none">
-        </div>
+    tbody.innerHTML += `
+      <tr onclick="seleccionarFila(${index})" class="${rowClass} cursor-pointer border-b border-gray-200">
+        <td class="p-1.5 font-mono">${item.codigo}</td>
+        <td class="p-1.5">${item.nombre}</td>
+        <td class="p-1.5 text-right font-mono">$${parseFloat(item.precio).toFixed(2)}</td>
+        <td class="p-1.5 text-center font-bold">${item.cantidad}</td>
+        <td class="p-1.5 text-right font-mono font-bold bg-[#f4fbf4] text-green-900">$${importe.toFixed(2)}</td>
+        <td class="p-1.5 text-center text-gray-500">${item.stock ?? 'N/A'}</td>
+      </tr>
+    `;
+  });
 
-        <div class="flex items-center gap-3">
-          <label class="w-32 text-right font-semibold">Precio Mayoreo:</label>
-          <input type="number" step="0.01" id="prod-mayoreo" placeholder="0.00" class="border border-gray-400 p-1 rounded w-32 font-mono outline-none">
-        </div>
+  document.getElementById('cart-total').innerText = `$${total.toFixed(2)}`;
+  document.getElementById('summary-total').innerText = `$${total.toFixed(2)}`;
+  document.getElementById('items-count').innerText = totalArticulos;
+}
 
-        <!-- Departamento -->
-        <div class="flex items-center gap-3">
-          <label class="w-32 text-right font-semibold">Departamento:</label>
-          <select id="prod-depto" class="border border-gray-400 p-1 rounded w-64 bg-white outline-none">
-            <option value="- Sin Departamento -">- Sin Departamento -</option>
-            <option value="Abarrotes">Abarrotes</option>
-            <option value="Bebidas">Bebidas</option>
-            <option value="Papelería">Papelería</option>
-          </select>
-        </div>
+function eliminarSeleccionado() {
+  if (itemSeleccionadoIndex !== null && carrito[itemSeleccionadoIndex]) {
+    carrito.splice(itemSeleccionadoIndex, 1);
+    itemSeleccionadoIndex = null;
+    actualizarTabla();
+  } else if (carrito.length > 0) {
+    carrito.pop();
+    actualizarTabla();
+  }
+  document.getElementById('barcode-input').focus();
+}
 
-        <!-- Sección de Inventario -->
-        <div class="mt-4 pt-3 border-t border-gray-200 flex gap-4">
-          <div class="w-4 bg-amber-400 flex items-center justify-center font-bold text-[10px] text-amber-900 py-6 write-vertical">
-            INVENTARIO
-          </div>
+function completarVenta() {
+  if (carrito.length === 0) return alert('No hay artículos en la venta actual.');
 
-          <div class="space-y-2">
-            <div>
-              <label class="flex items-center gap-2 cursor-pointer font-semibold">
-                <input type="checkbox" id="prod-usa-inv" checked onchange="toggleInventarioInputs(this.checked)">
-                Este producto SI utiliza inventario.
-              </label>
-            </div>
+  const total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+  const pagoStr = prompt(`TOTAL A COBRAR: $${total.toFixed(2)}\n\n¿Con cuánto paga el cliente?`, total);
 
-            <div id="inv-inputs" class="space-y-2 pl-4">
-              <div class="flex items-center gap-2">
-                <span>Hay</span>
-                <input type="number" id="prod-stock" value="10" class="border border-gray-400 p-1 rounded w-20 text-center font-bold font-mono">
-                <span>en este momento.</span>
-              </div>
+  if (pagoStr === null) return;
 
-              <div class="flex items-center gap-2">
-                <span class="w-12 text-right">Mínimo:</span>
-                <input type="number" id="prod-min" value="2" class="border border-gray-400 p-1 rounded w-20 text-center font-mono">
-              </div>
+  const pago = parseFloat(pagoStr);
+  if (isNaN(pago) || pago < total) {
+    return alert('Monto insuficiente o inválido.');
+  }
 
-              <div class="flex items-center gap-2">
-                <span class="w-12 text-right">Máximo:</span>
-                <input type="number" id="prod-max" value="50" class="border border-gray-400 p-1 rounded w-20 text-center font-mono">
-              </div>
-            </div>
-          </div>
-        </div>
+  const cambio = pago - total;
 
-        <button type="submit" id="btn-submit-hidden" class="hidden"></button>
-      </form>
+  document.getElementById('summary-pay').innerText = `$${pago.toFixed(2)}`;
+  document.getElementById('summary-change').innerText = `$${cambio.toFixed(2)}`;
 
-    </main>
+  const venta = {
+    id: Date.now(),
+    fecha: new Date().toISOString(),
+    items: carrito,
+    total: total,
+    pago: pago,
+    cambio: cambio
+  };
 
-    <!-- Botones Inferiores de Acción -->
-    <footer class="bg-[#f0f0f0] border-t border-gray-300 p-2 flex justify-between items-center px-4">
-      <button onclick="document.getElementById('form-producto').requestSubmit()" class="btn-action bg-white px-4 py-1.5 rounded text-green-800 font-bold flex items-center gap-1 shadow hover:bg-green-50 border-green-300 cursor-pointer">
-        <span>✅</span> Guardar Producto
-      </button>
+  const ventasPrevias = JSON.parse(localStorage.getItem('pos_ventas') || '[]');
+  ventasPrevias.push(venta);
+  localStorage.setItem('pos_ventas', JSON.stringify(ventasPrevias));
 
-      <button onclick="limpiarFormularioProducto(); cambiarModulo('ventas');" class="btn-action bg-white px-4 py-1.5 rounded text-red-700 font-bold flex items-center gap-1 shadow hover:bg-red-50 border-red-300 cursor-pointer">
-        <span>❌</span> Cancelar
-      </button>
-    </footer>
+  alert(`¡Venta realizada con éxito!\n\nCambio a entregar: $${cambio.toFixed(2)}`);
 
-  </div>
+  carrito = [];
+  itemSeleccionadoIndex = null;
+  actualizarTabla();
+  document.getElementById('barcode-input').focus();
+}
 
-  <!-- 8. Barra de Estado Inferior -->
-  <div class="bg-[#ffffcc] border-t border-gray-300 px-3 py-0.5 text-[11px] text-gray-700 flex justify-between items-center">
-    <div>💡 <strong>Punto de Venta</strong> ... Teclee o escanee el Código del Producto.</div>
-    <div class="text-gray-500 font-mono" id="live-clock">--:-- --</div>
-  </div>
+function reimprimirUltimoTicket() {
+  const ventas = JSON.parse(localStorage.getItem('pos_ventas') || '[]');
+  if (ventas.length === 0) return alert('No hay ventas registradas aún.');
 
-  <script src="app.js"></script>
-</body>
-</html>
+  const ultimaVenta = ventas[ventas.length - 1];
+  alert(`REIMPRESIÓN ÚLTIMO TICKET\nID Venta: ${ultimaVenta.id}\nTotal: $${ultimaVenta.total.toFixed(2)}\nPago: $${ultimaVenta.pago.toFixed(2)}\nCambio: $${ultimaVenta.cambio.toFixed(2)}`);
+}
+
+// ==================== LÓGICA DE PRODUCTOS ====================
+
+function calcularPrecioVenta() {
+  const costo = parseFloat(document.getElementById('prod-costo').value) || 0;
+  const ganancia = parseFloat(document.getElementById('prod-ganancia').value) || 0;
+
+  if (costo > 0 && ganancia > 0) {
+    const precioVenta = costo + (costo * (ganancia / 100));
+    document.getElementById('prod-precio').value = precioVenta.toFixed(2);
+  }
+}
+
+function toggleInventarioInputs(usaInventario) {
+  const invContainer = document.getElementById('inv-inputs');
+  if (usaInventario) {
+    invContainer.classList.remove('opacity-50', 'pointer-events-none');
+  } else {
+    invContainer.classList.add('opacity-50', 'pointer-events-none');
+  }
+}
+
+function guardarNuevoProducto(event) {
+  event.preventDefault();
+
+  const codigo = document.getElementById('prod-codigo').value.trim();
+  const nombre = document.getElementById('prod-nombre').value.trim();
+  const precio = parseFloat(document.getElementById('prod-precio').value) || 0;
+  const costo = parseFloat(document.getElementById('prod-costo').value) || 0;
+  const mayoreo = parseFloat(document.getElementById('prod-mayoreo').value) || 0;
+  const depto = document.getElementById('prod-depto').value;
+  const usaInv = document.getElementById('prod-usa-inv').checked;
+  const stock = usaInv ? (parseInt(document.getElementById('prod-stock').value) || 0) : 999;
+
+  let db = obtenerProductosDB();
+
+  // Verificar si el código ya existe
+  const indexExistente = db.findIndex(p => p.codigo === codigo);
+
+  const nuevoProd = {
+    id: indexExistente >= 0 ? db[indexExistente].id : Date.now().toString(),
+    codigo: codigo,
+    nombre: nombre,
+    precio: precio,
+    costo: costo,
+    mayoreo: mayoreo,
+    departamento: depto,
+    stock: stock
+  };
+
+  if (indexExistente >= 0) {
+    db[indexExistente] = nuevoProd;
+    alert('¡Producto actualizado correctamente!');
+  } else {
+    db.push(nuevoProd);
+    alert('¡Producto guardado exitosamente!');
+  }
+
+  localStorage.setItem('eleventa_productos', JSON.stringify(db));
+  productosBase = db;
+
+  limpiarFormularioProducto();
+  cambiarModulo('ventas');
+}
+
+function limpiarFormularioProducto() {
+  document.getElementById('form-producto').reset();
+  toggleInventarioInputs(true);
+}
+
+// Utilidades
+function iniciarReloj() {
+  const clockEl = document.getElementById('live-clock');
+  setInterval(() => {
+    const ahora = new Date();
+    clockEl.innerText = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + " - " + ahora.toLocaleDateString();
+  }, 1000);
+}
+
+function registrarServiceWorker() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(err => console.error(err));
+  }
+}
