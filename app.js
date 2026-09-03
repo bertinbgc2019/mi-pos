@@ -1,11 +1,22 @@
-// Base de datos local de productos
-const productosBase = [
-  { id: '1', codigo: '75010001', nombre: 'Agua Ciel 1L', precio: 15.00, stock: 45 },
-  { id: '2', codigo: '75010002', nombre: 'Galletas Chokis', precio: 22.00, stock: 18 },
-  { id: '3', codigo: '75010003', nombre: 'Refresco Coca-Cola 600ml', precio: 18.00, stock: 30 },
-  { id: '4', codigo: '75010004', nombre: 'Cuaderno Profesional', precio: 35.00, stock: 12 }
+// Base inicial de productos si no hay nada en localStorage
+const productosDefault = [
+  { id: '1', codigo: '75010001', nombre: 'Agua Ciel 1L', precio: 15.00, stock: 45, costo: 10.00 },
+  { id: '2', codigo: '75010002', nombre: 'Galletas Chokis', precio: 22.00, stock: 18, costo: 16.00 },
+  { id: '3', codigo: '75010003', nombre: 'Refresco Coca-Cola 600ml', precio: 18.00, stock: 30, costo: 13.00 },
+  { id: '4', codigo: '75010004', nombre: 'Cuaderno Profesional', precio: 35.00, stock: 12, costo: 25.00 }
 ];
 
+// Obtener catálogo almacenado
+function obtenerProductosDB() {
+  const db = localStorage.getItem('eleventa_productos');
+  if (!db) {
+    localStorage.setItem('eleventa_productos', JSON.stringify(productosDefault));
+    return productosDefault;
+  }
+  return JSON.parse(db);
+}
+
+let productosBase = obtenerProductosDB();
 let carrito = [];
 let itemSeleccionadoIndex = null;
 
@@ -14,19 +25,27 @@ document.addEventListener('DOMContentLoaded', () => {
   iniciarReloj();
 
   const barcodeInput = document.getElementById('barcode-input');
-  barcodeInput.focus();
+  if (barcodeInput) barcodeInput.focus();
 
   // Escaneo automático con Enter
-  barcodeInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      buscarProducto();
-    }
-  });
+  if (barcodeInput) {
+    barcodeInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        buscarProducto();
+      }
+    });
+  }
 
-  // Atajos de teclado estilo eleventa (F10, F12, Supr)
+  // Atajos de teclado estilo eleventa (F1, F3, F10, F12, Supr)
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'F12') {
+    if (e.key === 'F1') {
+      e.preventDefault();
+      cambiarModulo('ventas');
+    } else if (e.key === 'F3') {
+      e.preventDefault();
+      cambiarModulo('productos');
+    } else if (e.key === 'F12') {
       e.preventDefault();
       completarVenta();
     } else if (e.key === 'F10') {
@@ -38,11 +57,35 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+// Navegación entre Módulos Ventas (F1) y Productos (F3)
+function cambiarModulo(modulo) {
+  const modVentas = document.getElementById('modulo-ventas');
+  const modProductos = document.getElementById('modulo-productos');
+  const btnVentas = document.getElementById('nav-ventas');
+  const btnProductos = document.getElementById('nav-productos');
+
+  if (modulo === 'ventas') {
+    modVentas.classList.remove('hidden');
+    modProductos.classList.add('hidden');
+    btnVentas.classList.add('active');
+    btnProductos.classList.remove('active');
+    document.getElementById('barcode-input').focus();
+  } else if (modulo === 'productos') {
+    modVentas.classList.add('hidden');
+    modProductos.classList.remove('hidden');
+    btnVentas.classList.remove('active');
+    btnProductos.classList.add('active');
+    document.getElementById('prod-codigo').focus();
+  }
+}
+
+// Ventas y Carrito
 function buscarProducto() {
   const input = document.getElementById('barcode-input');
   const valor = input.value.trim();
   if (!valor) return;
 
+  productosBase = obtenerProductosDB(); // Actualizar productos
   const producto = productosBase.find(
     p => p.codigo === valor || p.nombre.toLowerCase().includes(valor.toLowerCase())
   );
@@ -51,7 +94,7 @@ function buscarProducto() {
     agregarAlCarrito(producto);
     input.value = '';
   } else {
-    alert('El producto no existe o no tiene existencia.');
+    alert('El producto no existe en el catálogo.');
     input.value = '';
   }
   input.focus();
@@ -99,10 +142,10 @@ function actualizarTabla() {
       <tr onclick="seleccionarFila(${index})" class="${rowClass} cursor-pointer border-b border-gray-200">
         <td class="p-1.5 font-mono">${item.codigo}</td>
         <td class="p-1.5">${item.nombre}</td>
-        <td class="p-1.5 text-right font-mono">$${item.precio.toFixed(2)}</td>
+        <td class="p-1.5 text-right font-mono">$${parseFloat(item.precio).toFixed(2)}</td>
         <td class="p-1.5 text-center font-bold">${item.cantidad}</td>
         <td class="p-1.5 text-right font-mono font-bold bg-[#f4fbf4] text-green-900">$${importe.toFixed(2)}</td>
-        <td class="p-1.5 text-center text-gray-500">${item.stock}</td>
+        <td class="p-1.5 text-center text-gray-500">${item.stock ?? 'N/A'}</td>
       </tr>
     `;
   });
@@ -171,6 +214,76 @@ function reimprimirUltimoTicket() {
   alert(`REIMPRESIÓN ÚLTIMO TICKET\nID Venta: ${ultimaVenta.id}\nTotal: $${ultimaVenta.total.toFixed(2)}\nPago: $${ultimaVenta.pago.toFixed(2)}\nCambio: $${ultimaVenta.cambio.toFixed(2)}`);
 }
 
+// ==================== LÓGICA DE PRODUCTOS ====================
+
+function calcularPrecioVenta() {
+  const costo = parseFloat(document.getElementById('prod-costo').value) || 0;
+  const ganancia = parseFloat(document.getElementById('prod-ganancia').value) || 0;
+
+  if (costo > 0 && ganancia > 0) {
+    const precioVenta = costo + (costo * (ganancia / 100));
+    document.getElementById('prod-precio').value = precioVenta.toFixed(2);
+  }
+}
+
+function toggleInventarioInputs(usaInventario) {
+  const invContainer = document.getElementById('inv-inputs');
+  if (usaInventario) {
+    invContainer.classList.remove('opacity-50', 'pointer-events-none');
+  } else {
+    invContainer.classList.add('opacity-50', 'pointer-events-none');
+  }
+}
+
+function guardarNuevoProducto(event) {
+  event.preventDefault();
+
+  const codigo = document.getElementById('prod-codigo').value.trim();
+  const nombre = document.getElementById('prod-nombre').value.trim();
+  const precio = parseFloat(document.getElementById('prod-precio').value) || 0;
+  const costo = parseFloat(document.getElementById('prod-costo').value) || 0;
+  const mayoreo = parseFloat(document.getElementById('prod-mayoreo').value) || 0;
+  const depto = document.getElementById('prod-depto').value;
+  const usaInv = document.getElementById('prod-usa-inv').checked;
+  const stock = usaInv ? (parseInt(document.getElementById('prod-stock').value) || 0) : 999;
+
+  let db = obtenerProductosDB();
+
+  // Verificar si el código ya existe
+  const indexExistente = db.findIndex(p => p.codigo === codigo);
+
+  const nuevoProd = {
+    id: indexExistente >= 0 ? db[indexExistente].id : Date.now().toString(),
+    codigo: codigo,
+    nombre: nombre,
+    precio: precio,
+    costo: costo,
+    mayoreo: mayoreo,
+    departamento: depto,
+    stock: stock
+  };
+
+  if (indexExistente >= 0) {
+    db[indexExistente] = nuevoProd;
+    alert('¡Producto actualizado correctamente!');
+  } else {
+    db.push(nuevoProd);
+    alert('¡Producto guardado exitosamente!');
+  }
+
+  localStorage.setItem('eleventa_productos', JSON.stringify(db));
+  productosBase = db;
+
+  limpiarFormularioProducto();
+  cambiarModulo('ventas');
+}
+
+function limpiarFormularioProducto() {
+  document.getElementById('form-producto').reset();
+  toggleInventarioInputs(true);
+}
+
+// Utilidades
 function iniciarReloj() {
   const clockEl = document.getElementById('live-clock');
   setInterval(() => {
