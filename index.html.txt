@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Punto de Venta PWA</title>
+  <link rel="manifest" href="manifest.json">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans h-screen flex flex-col">
+
+  <header class="bg-blue-600 text-white p-4 flex justify-between items-center shadow">
+    <h1 class="text-xl font-bold">POS PWA Gratis</h1>
+    <span id="status" class="text-xs bg-blue-700 px-2 py-1 rounded">Modo Local</span>
+  </header>
+
+  <main class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 p-4 overflow-hidden">
+    <!-- Columna Catálogo -->
+    <section class="md:col-span-2 flex flex-col bg-white rounded-lg shadow p-4 overflow-hidden">
+      <div class="mb-4 flex gap-2">
+        <input type="text" id="barcode-input" placeholder="Escanear código o nombre..." 
+               class="flex-1 border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <button onclick="buscarProducto()" class="bg-blue-600 text-white px-4 py-2 rounded">Agregar</button>
+      </div>
+
+      <h2 class="text-sm font-semibold text-gray-500 mb-2">Productos</h2>
+      <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 overflow-y-auto flex-1 p-1"></div>
+    </section>
+
+    <!-- Columna Carrito -->
+    <section class="flex flex-col bg-white rounded-lg shadow p-4">
+      <h2 class="text-lg font-bold mb-3 border-b pb-2">Carrito de Venta</h2>
+      <div id="cart-items" class="flex-1 overflow-y-auto space-y-2 mb-4"></div>
+
+      <div class="border-t pt-3 space-y-2">
+        <div class="flex justify-between text-xl font-bold">
+          <span>Total:</span>
+          <span id="cart-total">$0.00</span>
+        </div>
+        <button onclick="completarVenta()" class="w-full bg-green-600 text-white py-3 rounded-lg text-lg font-bold hover:bg-green-700 transition">
+          Cobrar Venta
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
