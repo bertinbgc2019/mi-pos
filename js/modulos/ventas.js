@@ -1,4 +1,39 @@
-// js/modulos/ventas.js - Lógica del Carrito y Cobro
+// js/modulos/ventas.js - Lógica del Carrito, Lectura de Barras y Cobro
+
+document.addEventListener('DOMContentLoaded', () => {
+  configurarLectorModoTexto();
+});
+
+function configurarLectorModoTexto() {
+  const input = document.getElementById('barcode-input');
+  if (!input) return;
+
+  // Detectar cuándo el lector presiona Enter automáticamente al terminar de leer
+  input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const codigo = input.value.trim();
+      if (codigo) {
+        buscarProductoPorCodigo(codigo);
+      }
+    }
+  });
+}
+
+function buscarProductoPorCodigo(codigo) {
+  if (!codigo) return;
+  
+  const prod = productos.find(p => p.codigo === codigo);
+  if (prod) {
+    agregarAlCarrito(prod);
+    const input = document.getElementById('barcode-input');
+    if (input) input.value = '';
+  } else {
+    alert(`Producto no encontrado para el código: ${codigo}`);
+    const input = document.getElementById('barcode-input');
+    if (input) input.select();
+  }
+}
 
 function agregarAlCarrito(producto) {
   const itemExistente = carrito.find(item => item.id === producto.id);
@@ -18,18 +53,6 @@ function agregarAlCarrito(producto) {
   actualizarTablaCarrito();
 }
 
-function buscarProductoPorCodigo(codigo) {
-  if (!codigo.trim()) return;
-  
-  const prod = productos.find(p => p.codigo === codigo.trim());
-  if (prod) {
-    agregarAlCarrito(prod);
-    document.getElementById('barcode-input').value = '';
-  } else {
-    alert('Producto no encontrado');
-  }
-}
-
 function actualizarTablaCarrito() {
   const tbody = document.getElementById('carrito-body');
   const totalEl = document.getElementById('total-pagar');
@@ -43,15 +66,16 @@ function actualizarTablaCarrito() {
     total += subtotal;
 
     const tr = document.createElement('tr');
+    tr.className = "hover:bg-gray-50 border-b border-gray-200";
     tr.innerHTML = `
-      <td>${item.nombre}</td>
-      <td>
-        <input type="number" value="${item.cantidad}" min="1" class="w-16 border rounded p-1 text-center" onchange="cambiarCantidadCarrito(${index}, this.value)">
+      <td class="p-1.5 font-medium text-gray-800">${item.nombre}</td>
+      <td class="p-1.5 text-center">
+        <input type="number" value="${item.cantidad}" min="1" class="w-16 border rounded p-1 text-center font-mono font-bold" onchange="cambiarCantidadCarrito(${index}, this.value)">
       </td>
-      <td>$${item.precio.toFixed(2)}</td>
-      <td>$${subtotal.toFixed(2)}</td>
-      <td>
-        <button onclick="eliminarDelCarrito(${index})" class="text-red-600 hover:text-red-800 font-bold px-2">✕</button>
+      <td class="p-1.5 text-right font-mono">$${item.precio.toFixed(2)}</td>
+      <td class="p-1.5 text-right font-mono font-bold text-blue-900 bg-[#f4f9f4]">$${subtotal.toFixed(2)}</td>
+      <td class="p-1.5 text-center">
+        <button onclick="eliminarDelCarrito(${index})" class="text-red-600 hover:text-red-800 font-bold px-2 py-0.5 rounded border border-red-200 hover:bg-red-50">✕</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -78,6 +102,8 @@ function eliminarDelCarrito(index) {
 function limpiarCarrito() {
   carrito = [];
   actualizarTablaCarrito();
+  const input = document.getElementById('barcode-input');
+  if (input) input.focus();
 }
 
 function procesarCobro() {
