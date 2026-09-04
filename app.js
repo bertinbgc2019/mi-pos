@@ -22,6 +22,7 @@ function obtenerProductosDB() {
 let productosBase = obtenerProductosDB();
 let carrito = [];
 let itemSeleccionadoIndex = null;
+let html5QrCode = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   registrarServiceWorker();
@@ -271,6 +272,60 @@ function reimprimirUltimoTicket() {
 
   const ultimaVenta = ventas[ventas.length - 1];
   alert(`REIMPRESIÓN ÚLTIMO TICKET\nID Venta: ${ultimaVenta.id}\nTotal: $${ultimaVenta.total.toFixed(2)}\nPago: $${ultimaVenta.pago.toFixed(2)}\nCambio: $${ultimaVenta.cambio.toFixed(2)}`);
+}
+
+// ==================== LÓGICA DE ESCÁNER DE CÁMARA ====================
+
+function abrirEscanerCamara() {
+  const modal = document.getElementById('modal-scanner');
+  modal.classList.remove('hidden');
+
+  if (!html5QrCode) {
+    html5QrCode = new Html5Qrcode("reader");
+  }
+
+  const config = { 
+    fps: 10, 
+    qrbox: { width: 250, height: 150 },
+    aspectRatio: 1.0
+  };
+
+  html5QrCode.start(
+    { facingMode: "environment" }, // Prioriza la cámara trasera en dispositivos móviles
+    config,
+    onScanSuccess,
+    onScanFailure
+  ).catch(err => {
+    alert("No se pudo acceder a la cámara o requiere permisos: " + err);
+    cerrarEscanerCamara();
+  });
+}
+
+function onScanSuccess(decodedText, decodedResult) {
+  document.getElementById('barcode-input').value = decodedText;
+  cerrarEscanerCamara();
+  buscarProducto();
+  
+  if ('vibrate' in navigator) {
+    navigator.vibrate(100); // Vibración al escanear correctamente
+  }
+}
+
+function onScanFailure(error) {
+  // Búsqueda continua sin interrumpir
+}
+
+function cerrarEscanerCamara() {
+  const modal = document.getElementById('modal-scanner');
+  if (html5QrCode && html5QrCode.isScanning) {
+    html5QrCode.stop().then(() => {
+      modal.classList.add('hidden');
+    }).catch(() => {
+      modal.classList.add('hidden');
+    });
+  } else {
+    modal.classList.add('hidden');
+  }
 }
 
 // ==================== LÓGICA DE PRODUCTOS ====================
