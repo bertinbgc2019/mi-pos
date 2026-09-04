@@ -1,10 +1,13 @@
 // Base inicial de productos si no hay nada en localStorage
 const productosDefault = [
-  { id: '1', codigo: '75010001', nombre: 'Agua Ciel 1L', precio: 15.00, stock: 45, costo: 10.00 },
-  { id: '2', codigo: '75010002', nombre: 'Galletas Chokis', precio: 22.00, stock: 18, costo: 16.00 },
-  { id: '3', codigo: '75010003', nombre: 'Refresco Coca-Cola 600ml', precio: 18.00, stock: 30, costo: 13.00 },
-  { id: '4', codigo: '75010004', nombre: 'Cuaderno Profesional', precio: 35.00, stock: 12, costo: 25.00 }
+  { id: '1', codigo: '75010001', nombre: 'Agua Ciel 1L', precio: 15.00, stock: 45, costo: 10.00, imagen: '' },
+  { id: '2', codigo: '75010002', nombre: 'Galletas Chokis', precio: 22.00, stock: 18, costo: 16.00, imagen: '' },
+  { id: '3', codigo: '75010003', nombre: 'Refresco Coca-Cola 600ml', precio: 18.00, stock: 30, costo: 13.00, imagen: '' },
+  { id: '4', codigo: '75010004', nombre: 'Cuaderno Profesional', precio: 35.00, stock: 12, costo: 25.00, imagen: '' }
 ];
+
+// CONFIGURACIÓN DE MEMBRESÍA (Año-Mes-Día)
+const FECHA_VENCIMIENTO_LICENCIA = "2026-09-30"; 
 
 // Obtener catálogo almacenado
 function obtenerProductosDB() {
@@ -23,6 +26,7 @@ let itemSeleccionadoIndex = null;
 document.addEventListener('DOMContentLoaded', () => {
   registrarServiceWorker();
   iniciarReloj();
+  verificarEstadoMembresia();
 
   const barcodeInput = document.getElementById('barcode-input');
   if (barcodeInput) barcodeInput.focus();
@@ -57,6 +61,36 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+// Verificación de Membresía
+async function verificarEstadoMembresia() {
+  let fechaActual;
+
+  try {
+    const res = await fetch('https://worldtimeapi.org/api/ip', { cache: "no-store" });
+    const data = await res.json();
+    fechaActual = new Date(data.datetime);
+  } catch (err) {
+    fechaActual = new Date();
+  }
+
+  const fechaLimite = new Date(FECHA_VENCIMIENTO_LICENCIA + "T23:59:59");
+
+  if (fechaActual > fechaLimite) {
+    bloquearSistema();
+  }
+}
+
+function bloquearSistema() {
+  const modal = document.getElementById('modal-licencia-bloqueo');
+  if (modal) {
+    modal.classList.remove('hidden');
+  }
+  document.onkeydown = (e) => {
+    e.stopPropagation();
+    return false;
+  };
+}
+
 // Navegación entre Módulos Ventas (F1) y Productos (F3)
 function cambiarModulo(modulo) {
   const modVentas = document.getElementById('modulo-ventas');
@@ -79,13 +113,28 @@ function cambiarModulo(modulo) {
   }
 }
 
+// Visor de Imagen de Producto
+function mostrarImagenProducto(imagenUrl) {
+  const imgEl = document.getElementById('product-preview-img');
+  const placeholderEl = document.getElementById('product-preview-placeholder');
+
+  if (imagenUrl) {
+    imgEl.src = imagenUrl;
+    imgEl.classList.remove('hidden');
+    placeholderEl.classList.add('hidden');
+  } else {
+    imgEl.classList.add('hidden');
+    placeholderEl.classList.remove('hidden');
+  }
+}
+
 // Ventas y Carrito
 function buscarProducto() {
   const input = document.getElementById('barcode-input');
   const valor = input.value.trim();
   if (!valor) return;
 
-  productosBase = obtenerProductosDB(); // Actualizar productos
+  productosBase = obtenerProductosDB();
   const producto = productosBase.find(
     p => p.codigo === valor || p.nombre.toLowerCase().includes(valor.toLowerCase())
   );
@@ -115,11 +164,16 @@ function agregarAlCarrito(producto) {
   } else {
     carrito.push({ ...producto, cantidad: 1 });
   }
+
+  mostrarImagenProducto(producto.imagen || null);
   actualizarTabla();
 }
 
 function seleccionarFila(index) {
   itemSeleccionadoIndex = index;
+  if (carrito[index]) {
+    mostrarImagenProducto(carrito[index].imagen || null);
+  }
   actualizarTabla();
 }
 
@@ -159,11 +213,15 @@ function eliminarSeleccionado() {
   if (itemSeleccionadoIndex !== null && carrito[itemSeleccionadoIndex]) {
     carrito.splice(itemSeleccionadoIndex, 1);
     itemSeleccionadoIndex = null;
-    actualizarTabla();
   } else if (carrito.length > 0) {
     carrito.pop();
-    actualizarTabla();
   }
+  
+  if (carrito.length === 0) {
+    mostrarImagenProducto(null);
+  }
+  
+  actualizarTabla();
   document.getElementById('barcode-input').focus();
 }
 
@@ -202,6 +260,7 @@ function completarVenta() {
 
   carrito = [];
   itemSeleccionadoIndex = null;
+  mostrarImagenProducto(null);
   actualizarTabla();
   document.getElementById('barcode-input').focus();
 }
@@ -249,7 +308,6 @@ function guardarNuevoProducto(event) {
 
   let db = obtenerProductosDB();
 
-  // Verificar si el código ya existe
   const indexExistente = db.findIndex(p => p.codigo === codigo);
 
   const nuevoProd = {
@@ -297,44 +355,3 @@ function registrarServiceWorker() {
     navigator.serviceWorker.register('sw.js').catch(err => console.error(err));
   }
 }
-// CONFIGURACIÓN DE MEMBRESÍA (Año-Mes-Día)
-// Cambia esta fecha al día límite que haya pagado tu cliente:
-const FECHA_VENCIMIENTO_LICENCIA = "2026-09-30"; 
-
-async function verificarEstadoMembresia() {
-  let fechaActual;
-
-  try {
-    // Intenta obtener la fecha real desde internet para evitar trampas con el reloj de la PC
-    const res = await fetch('https://worldtimeapi.org/api/ip', { cache: "no-store" });
-    const data = await res.json();
-    fechaActual = new Date(data.datetime);
-  } catch (err) {
-    // Si está offline, usa la fecha de la máquina
-    fechaActual = new Date();
-  }
-
-  const fechaLimite = new Date(FECHA_VENCIMIENTO_LICENCIA + "T23:59:59");
-
-  // Comparar fechas
-  if (fechaActual > fechaLimite) {
-    bloquearSistema();
-  }
-}
-
-function bloquearSistema() {
-  const modal = document.getElementById('modal-licencia-bloqueo');
-  if (modal) {
-    modal.classList.remove('hidden');
-  }
-  // Deshabilitar atajos de teclado
-  document.onkeydown = (e) => {
-    e.stopPropagation();
-    return false;
-  };
-}
-
-// Ejecutar la verificación al cargar la página
-document.addEventListener('DOMContentLoaded', () => {
-  verificarEstadoMembresia();
-});
