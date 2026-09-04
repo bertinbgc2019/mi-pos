@@ -274,24 +274,41 @@ function reimprimirUltimoTicket() {
   alert(`REIMPRESIÓN ÚLTIMO TICKET\nID Venta: ${ultimaVenta.id}\nTotal: $${ultimaVenta.total.toFixed(2)}\nPago: $${ultimaVenta.pago.toFixed(2)}\nCambio: $${ultimaVenta.cambio.toFixed(2)}`);
 }
 
-// ==================== LÓGICA DE ESCÁNER DE CÁMARA ====================
+// ==================== LÓGICA DE ESCÁNER DE CÁMARA OPTIMIZADA ====================
 
 function abrirEscanerCamara() {
   const modal = document.getElementById('modal-scanner');
   modal.classList.remove('hidden');
 
   if (!html5QrCode) {
-    html5QrCode = new Html5Qrcode("reader");
+    // Declaración explícita de formatos de códigos de barras (1D y 2D)
+    const formatsToSupport = [
+      Html5QrcodeSupportedFormats.EAN_13,
+      Html5QrcodeSupportedFormats.EAN_8,
+      Html5QrcodeSupportedFormats.CODE_128,
+      Html5QrcodeSupportedFormats.CODE_39,
+      Html5QrcodeSupportedFormats.UPC_A,
+      Html5QrcodeSupportedFormats.UPC_E,
+      Html5QrcodeSupportedFormats.QR_CODE
+    ];
+
+    html5QrCode = new Html5Qrcode("reader", { formatsToSupport: formatsToSupport });
   }
 
+  // Configuración de enfoque, alta resolución (HD) y área rectangular horizontal
   const config = { 
-    fps: 10, 
-    qrbox: { width: 250, height: 150 },
-    aspectRatio: 1.0
+    fps: 15, 
+    qrbox: { width: 280, height: 140 }, // Área amplia para barras largas
+    videoConstraints: {
+      facingMode: "environment", // Lente trasera principal
+      width: { min: 640, ideal: 1280, max: 1920 },
+      height: { min: 480, ideal: 720, max: 1080 },
+      focusMode: "continuous" // Fuerza autoenfoque continuo
+    }
   };
 
   html5QrCode.start(
-    { facingMode: "environment" }, // Prioriza la cámara trasera en dispositivos móviles
+    { facingMode: "environment" },
     config,
     onScanSuccess,
     onScanFailure
@@ -307,12 +324,12 @@ function onScanSuccess(decodedText, decodedResult) {
   buscarProducto();
   
   if ('vibrate' in navigator) {
-    navigator.vibrate(100); // Vibración al escanear correctamente
+    navigator.vibrate(100);
   }
 }
 
 function onScanFailure(error) {
-  // Búsqueda continua sin interrumpir
+  // Proceso continuo de enfoque y lectura en segundo plano
 }
 
 function cerrarEscanerCamara() {
