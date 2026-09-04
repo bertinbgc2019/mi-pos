@@ -55,7 +55,7 @@
       <span>VENTA - Ticket 1</span>
     </div>
 
-    <!-- Sub-barra de Acciones con Visor de Foto e Icono de Cámara Compacto -->
+    <!-- Sub-barra de Acciones con Visor de Foto e Icono de Cámara -->
     <div class="bg-[#f0f0f0] p-2 border-b border-gray-300 flex items-center gap-3">
       <!-- Visor de foto del producto -->
       <div class="w-20 h-20 bg-white border border-gray-400 rounded-md flex items-center justify-center overflow-hidden shadow-inner flex-shrink-0">
@@ -69,7 +69,7 @@
           <span class="font-bold text-gray-700 text-sm">Producto:</span>
           <input type="text" id="barcode-input" autofocus class="border border-gray-400 p-1.5 rounded w-60 text-base font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-inner">
           
-          <!-- Icono Solo Cámara para Ventas -->
+          <!-- Icono Cámara Ventas -->
           <button type="button" onclick="abrirEscanerCamara('barcode-input')" title="Escanear Código con Cámara" class="btn-action p-1.5 rounded text-blue-900 bg-blue-50 border-blue-400 font-bold shadow-sm hover:bg-blue-100 cursor-pointer text-base">
             📷
           </button>
@@ -109,7 +109,7 @@
           </tr>
         </thead>
         <tbody id="cart-rows" class="divide-y divide-gray-200">
-          <!-- Dinámico -->
+          <!-- Contenido dinámico -->
         </tbody>
       </table>
     </main>
@@ -188,17 +188,16 @@
       NUEVO / MODIFICAR PRODUCTO
     </div>
 
-    <!-- Formulario de Alta con Selector de Foto a la Derecha -->
+    <!-- Formulario de Alta con Selector de Foto -->
     <main class="flex-1 bg-white p-4 overflow-y-auto text-gray-800 flex justify-between items-start gap-6">
       
       <form id="form-producto" onsubmit="guardarNuevoProducto(event)" class="flex-1 max-w-2xl space-y-3">
         
-        <!-- Nuevo Código + Icono Cámara -->
+        <!-- Nuevo Código -->
         <div class="flex items-center gap-3">
           <label class="w-32 text-right font-semibold">Nuevo Código:</label>
           <div class="flex items-center gap-1">
             <input type="text" id="prod-codigo" required placeholder="Ingresa o busca un Código de Barras" class="border border-gray-400 p-1 rounded w-80 font-mono text-sm focus:ring-1 focus:ring-amber-500 outline-none">
-            <!-- Icono Solo Cámara para Alta de Productos -->
             <button type="button" onclick="abrirEscanerCamara('prod-codigo')" title="Escanear Código con Cámara" class="btn-action p-1 rounded text-blue-900 bg-blue-50 border-blue-400 font-bold shadow-sm hover:bg-blue-100 cursor-pointer text-base">
               📷
             </button>
@@ -299,7 +298,7 @@
         <button type="submit" id="btn-submit-hidden" class="hidden"></button>
       </form>
 
-      <!-- Panel Derecho: Carga/Captura de Imagen del Producto -->
+      <!-- Panel Derecho: Carga/Captura de Imagen -->
       <div class="w-64 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50 shadow-sm mr-8">
         <span class="font-semibold text-gray-600 mb-2">Imagen del Producto</span>
         
@@ -311,7 +310,8 @@
           </div>
         </div>
 
-        <input type="file" id="input-prod-foto" accept="image/*" capture="environment" onchange="procesarFotoSeleccionada(event)" class="hidden">
+        <!-- Input para cargar archivo o usar cámara -->
+        <input type="file" id="input-prod-foto" accept="image/*" onchange="procesarFotoSeleccionada(event)" class="hidden">
         
         <button type="button" onclick="limpiarFotoProducto()" class="mt-2 text-[11px] text-red-600 hover:underline font-semibold">
           🗑️ Quitar imagen
@@ -321,11 +321,11 @@
     </main>
 
     <footer class="bg-[#f0f0f0] border-t border-gray-300 p-2 flex justify-between items-center px-4">
-      <button onclick="document.getElementById('form-producto').requestSubmit()" class="btn-action bg-white px-4 py-1.5 rounded text-green-800 font-bold flex items-center gap-1 shadow hover:bg-green-50 border-green-300 cursor-pointer">
+      <button type="button" onclick="ejecutarGuardadoFormulario()" class="btn-action bg-white px-4 py-1.5 rounded text-green-800 font-bold flex items-center gap-1 shadow hover:bg-green-50 border-green-300 cursor-pointer">
         <span>✅</span> Guardar Producto
       </button>
 
-      <button onclick="limpiarFormularioProducto(); cambiarModulo('ventas');" class="btn-action bg-white px-4 py-1.5 rounded text-red-700 font-bold flex items-center gap-1 shadow hover:bg-red-50 border-red-300 cursor-pointer">
+      <button type="button" onclick="limpiarFormularioProducto(); cambiarModulo('ventas');" class="btn-action bg-white px-4 py-1.5 rounded text-red-700 font-bold flex items-center gap-1 shadow hover:bg-red-50 border-red-300 cursor-pointer">
         <span>❌</span> Cancelar
       </button>
     </footer>
