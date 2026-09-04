@@ -21,8 +21,8 @@ let productosBase = obtenerProductosDB();
 let carrito = [];
 let itemSeleccionadoIndex = null;
 let html5QrCode = null;
-let targetInputId = 'barcode-input'; // Elemento donde se escribe el código leído
-let imagenProductoTemporal = ''; // Guardar base64 de la foto
+let targetInputId = 'barcode-input'; 
+let imagenProductoTemporal = ''; 
 
 document.addEventListener('DOMContentLoaded', () => {
   registrarServiceWorker();
@@ -267,7 +267,7 @@ function reimprimirUltimoTicket() {
 // ==================== LÓGICA DE ESCÁNER DE CÁMARA ====================
 
 function abrirEscanerCamara(inputId = 'barcode-input') {
-  targetInputId = inputId; // Define en qué input escribirá el resultado
+  targetInputId = inputId;
   const modal = document.getElementById('modal-scanner');
   modal.classList.remove('hidden');
 
@@ -325,7 +325,7 @@ function onScanSuccess(decodedText, decodedResult) {
 }
 
 function onScanFailure(error) {
-  // Proceso continuo de escaneo
+  // Proceso continuo
 }
 
 function cerrarEscanerCamara() {
@@ -343,20 +343,49 @@ function cerrarEscanerCamara() {
 
 // ==================== LÓGICA DE PRODUCTOS E IMÁGENES ====================
 
+// Procesa y comprime automáticamente la imagen para garantizar compatibilidad total en PC y móviles
 function procesarFotoSeleccionada(event) {
   const file = event.target.files[0];
   if (!file) return;
 
   const reader = new FileReader();
   reader.onload = function(e) {
-    imagenProductoTemporal = e.target.result;
-    
-    const preview = document.getElementById('new-prod-img-preview');
-    const placeholder = document.getElementById('new-prod-img-placeholder');
-    
-    preview.src = imagenProductoTemporal;
-    preview.classList.remove('hidden');
-    placeholder.classList.add('hidden');
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const MAX_WIDTH = 400;
+      const MAX_HEIGHT = 400;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > MAX_WIDTH) {
+          height *= MAX_WIDTH / width;
+          width = MAX_WIDTH;
+        }
+      } else {
+        if (height > MAX_HEIGHT) {
+          width *= MAX_HEIGHT / height;
+          height = MAX_HEIGHT;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Comprimir a JPEG con calidad 0.7
+      imagenProductoTemporal = canvas.toDataURL('image/jpeg', 0.7);
+
+      const preview = document.getElementById('new-prod-img-preview');
+      const placeholder = document.getElementById('new-prod-img-placeholder');
+
+      preview.src = imagenProductoTemporal;
+      preview.classList.remove('hidden');
+      placeholder.classList.add('hidden');
+    };
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
@@ -387,6 +416,10 @@ function toggleInventarioInputs(usaInventario) {
   }
 }
 
+function ejecutarGuardadoFormulario() {
+  document.getElementById('form-producto').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+}
+
 function guardarNuevoProducto(event) {
   event.preventDefault();
 
@@ -398,6 +431,11 @@ function guardarNuevoProducto(event) {
   const depto = document.getElementById('prod-depto').value;
   const usaInv = document.getElementById('prod-usa-inv').checked;
   const stock = usaInv ? (parseInt(document.getElementById('prod-stock').value) || 0) : 999;
+
+  if (!codigo || !nombre || precio <= 0) {
+    alert('Por favor, ingresa el código, la descripción y un precio de venta válido.');
+    return;
+  }
 
   let db = obtenerProductosDB();
   const indexExistente = db.findIndex(p => p.codigo === codigo);
