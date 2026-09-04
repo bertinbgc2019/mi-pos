@@ -54,27 +54,32 @@
       <span>VENTA - Ticket 1</span>
     </div>
 
-    <!-- Sub-barra de Acciones con Visor de Foto del Producto -->
-    <div class="bg-[#f0f0f0] p-1.5 border-b border-gray-300 flex items-center gap-2">
-      <div class="w-10 h-10 bg-white border border-gray-400 rounded flex items-center justify-center overflow-hidden shadow-inner flex-shrink-0">
-        <img id="product-preview-img" src="" alt="Producto" class="object-cover w-full h-full hidden">
-        <span id="product-preview-placeholder" class="text-gray-400 text-base">📷</span>
+    <<!-- Sub-barra de Acciones con Visor de Foto del Producto Ampliado -->
+    <div class="bg-[#f0f0f0] p-2 border-b border-gray-300 flex items-center gap-3">
+      <!-- Visor de imagen agrandado a 80x80px (w-20 h-20) -->
+      <div class="w-20 h-20 bg-white border border-gray-400 rounded-md flex items-center justify-center overflow-hidden shadow-inner flex-shrink-0">
+        <img id="product-preview-img" src="" alt="Producto" class="object-contain w-full h-full hidden">
+        <span id="product-preview-placeholder" class="text-gray-400 text-3xl">📷</span>
       </div>
 
-      <span class="font-semibold text-gray-700">Producto:</span>
-      <input type="text" id="barcode-input" autofocus class="border border-gray-400 p-1 rounded w-64 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white shadow-inner">
-      
-      <button onclick="buscarProducto()" class="btn-action px-2 py-1 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm">
-        <span>🛒</span> ENTER - Agregar Producto
-      </button>
-      <button onclick="buscarProductoPrompt()" class="btn-action px-2 py-1 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm">
-        <span class="text-blue-600">🔍 F10</span> Buscar
-      </button>
-      <button onclick="eliminarSeleccionado()" class="btn-action px-2 py-1 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm">
-        <span class="text-red-600">🗑️ DEL</span> Borrar Art.
-      </button>
+      <!-- Campo de entrada y botones de acción -->
+      <div class="flex-1 flex flex-wrap items-center gap-2">
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-gray-700 text-sm">Producto:</span>
+          <input type="text" id="barcode-input" autofocus class="border border-gray-400 p-1.5 rounded w-72 text-base font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-inner">
+        </div>
+        
+        <button onclick="buscarProducto()" class="btn-action px-3 py-1.5 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm text-xs">
+          <span>🛒</span> ENTER - Agregar Producto
+        </button>
+        <button onclick="buscarProductoPrompt()" class="btn-action px-3 py-1.5 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm text-xs">
+          <span class="text-blue-600">🔍 F10</span> Buscar
+        </button>
+        <button onclick="eliminarSeleccionado()" class="btn-action px-3 py-1.5 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm text-xs">
+          <span class="text-red-600">🗑️ DEL</span> Borrar Art.
+        </button>
+      </div>
     </div>
-
     <!-- Pestañas de Tickets -->
     <div class="bg-[#d6d6d6] px-2 pt-1 flex items-center gap-1 border-b border-gray-400">
       <div class="bg-white border-t-2 border-t-blue-600 border-x border-gray-400 px-3 py-1 font-bold rounded-t text-gray-800 flex items-center gap-1 shadow">
