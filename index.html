@@ -6,7 +6,7 @@
   <title>eleventa POS - PWA</title>
   <link rel="manifest" href="manifest.json">
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Librería para escaneo de código de barras con la cámara -->
+  <!-- Librería para escaneo de código de barras -->
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
@@ -23,7 +23,7 @@
 </head>
 <body class="bg-[#f0f0f0] text-gray-800 h-screen flex flex-col justify-between overflow-hidden text-xs">
 
-  <!-- 1. Encabezado Superior (Barra de Navegación Global) -->
+  <!-- Encabezado Superior -->
   <header class="bg-[#f5f5f5] border-b border-gray-300 p-1 flex justify-between items-center">
     <div class="flex items-center gap-1 overflow-x-auto">
       <div class="flex items-center gap-1 font-bold text-base px-2 text-blue-900 border-r border-gray-300 pr-3">
@@ -51,12 +51,11 @@
   <!-- ==================== MÓDULO 1: VENTAS ==================== -->
   <div id="modulo-ventas" class="flex-1 flex flex-col justify-between overflow-hidden">
     
-    <!-- Banner de Módulo Ventas -->
     <div class="bg-[#2c5282] text-white px-3 py-1 font-bold text-sm shadow-inner flex justify-between items-center">
       <span>VENTA - Ticket 1</span>
     </div>
 
-    <!-- Sub-barra de Acciones con Visor de Foto Ampliado (80x80px) y Botón de Cámara -->
+    <!-- Sub-barra de Acciones con Visor de Foto e Icono de Cámara Compacto -->
     <div class="bg-[#f0f0f0] p-2 border-b border-gray-300 flex items-center gap-3">
       <!-- Visor de foto del producto -->
       <div class="w-20 h-20 bg-white border border-gray-400 rounded-md flex items-center justify-center overflow-hidden shadow-inner flex-shrink-0">
@@ -64,20 +63,20 @@
         <span id="product-preview-placeholder" class="text-gray-400 text-3xl">📷</span>
       </div>
 
-      <!-- Entradas y Botones de Acción -->
+      <!-- Entradas y Botones -->
       <div class="flex-1 flex flex-wrap items-center gap-2">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1">
           <span class="font-bold text-gray-700 text-sm">Producto:</span>
           <input type="text" id="barcode-input" autofocus class="border border-gray-400 p-1.5 rounded w-60 text-base font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-inner">
+          
+          <!-- Icono Solo Cámara para Ventas -->
+          <button type="button" onclick="abrirEscanerCamara('barcode-input')" title="Escanear Código con Cámara" class="btn-action p-1.5 rounded text-blue-900 bg-blue-50 border-blue-400 font-bold shadow-sm hover:bg-blue-100 cursor-pointer text-base">
+            📷
+          </button>
         </div>
         
         <button onclick="buscarProducto()" class="btn-action px-3 py-1.5 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm text-xs">
           <span>🛒</span> ENTER - Agregar
-        </button>
-
-        <!-- Botón para Escanear con Cámara (Teléfonos / Tabletas) -->
-        <button onclick="abrirEscanerCamara()" class="btn-action px-3 py-1.5 rounded text-blue-900 bg-blue-50 border-blue-400 font-bold flex items-center gap-1 shadow-sm text-xs hover:bg-blue-100">
-          <span class="text-base">📷</span> Escanear con Cámara
         </button>
 
         <button onclick="buscarProductoPrompt()" class="btn-action px-3 py-1.5 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm text-xs">
@@ -110,17 +109,17 @@
           </tr>
         </thead>
         <tbody id="cart-rows" class="divide-y divide-gray-200">
-          <!-- Contenido generado por app.js -->
+          <!-- Dinámico -->
         </tbody>
       </table>
     </main>
 
-    <!-- Resumen de Conteo -->
+    <!-- Resumen -->
     <div class="bg-[#f0f0f0] px-3 py-1 border-t border-gray-300 text-gray-600 font-semibold">
       <span id="items-count">0</span> Productos en la venta actual.
     </div>
 
-    <!-- Panel Inferior de Cobro -->
+    <!-- Panel Inferior -->
     <footer class="bg-[#e6e6e6] border-t border-gray-400 p-2 grid grid-cols-1 md:grid-cols-3 gap-2 items-center">
       <div class="flex flex-col gap-1">
         <div class="flex gap-1">
@@ -154,12 +153,10 @@
   <!-- ==================== MÓDULO 2: PRODUCTOS ==================== -->
   <div id="modulo-productos" class="flex-1 flex flex-col justify-between overflow-hidden hidden">
     
-    <!-- Banner Dorado de Productos -->
     <div class="bg-[#c28e2b] text-white px-3 py-1 font-bold text-sm shadow-inner">
       PRODUCTOS
     </div>
 
-    <!-- Sub-barra de Navegación de Productos -->
     <div class="bg-[#f0f0f0] p-1 border-b border-gray-300 flex items-center gap-1 overflow-x-auto">
       <button class="subnav-btn active px-3 py-1 rounded flex items-center gap-1 text-green-700 font-bold">
         <span class="text-green-600">➕</span> Nuevo
@@ -187,20 +184,25 @@
       </button>
     </div>
 
-    <!-- Título de Acción -->
     <div class="px-4 pt-2 text-[#d97706] font-bold text-base border-b border-gray-200 pb-1">
       NUEVO / MODIFICAR PRODUCTO
     </div>
 
-    <!-- Formulario de Alta de Producto -->
-    <main class="flex-1 bg-white p-4 overflow-y-auto text-gray-800">
+    <!-- Formulario de Alta con Selector de Foto a la Derecha -->
+    <main class="flex-1 bg-white p-4 overflow-y-auto text-gray-800 flex justify-between items-start gap-6">
       
-      <form id="form-producto" onsubmit="guardarNuevoProducto(event)" class="max-w-4xl space-y-3">
+      <form id="form-producto" onsubmit="guardarNuevoProducto(event)" class="flex-1 max-w-2xl space-y-3">
         
-        <!-- Código del Producto -->
+        <!-- Nuevo Código + Icono Cámara -->
         <div class="flex items-center gap-3">
           <label class="w-32 text-right font-semibold">Nuevo Código:</label>
-          <input type="text" id="prod-codigo" required placeholder="Ingresa o busca un Código de Barras" class="border border-gray-400 p-1 rounded w-80 font-mono text-sm focus:ring-1 focus:ring-amber-500 outline-none">
+          <div class="flex items-center gap-1">
+            <input type="text" id="prod-codigo" required placeholder="Ingresa o busca un Código de Barras" class="border border-gray-400 p-1 rounded w-80 font-mono text-sm focus:ring-1 focus:ring-amber-500 outline-none">
+            <!-- Icono Solo Cámara para Alta de Productos -->
+            <button type="button" onclick="abrirEscanerCamara('prod-codigo')" title="Escanear Código con Cámara" class="btn-action p-1 rounded text-blue-900 bg-blue-50 border-blue-400 font-bold shadow-sm hover:bg-blue-100 cursor-pointer text-base">
+              📷
+            </button>
+          </div>
         </div>
 
         <!-- Descripción -->
@@ -225,7 +227,7 @@
           </div>
         </div>
 
-        <!-- Precios y Ganancia -->
+        <!-- Precios -->
         <div class="flex items-center gap-3">
           <label class="w-32 text-right font-semibold">Precio Costo:</label>
           <input type="number" step="0.01" id="prod-costo" oninput="calcularPrecioVenta()" placeholder="0.00" class="border border-gray-400 p-1 rounded w-32 font-mono outline-none">
@@ -260,7 +262,7 @@
           </select>
         </div>
 
-        <!-- Sección de Inventario -->
+        <!-- Sección Inventario -->
         <div class="mt-4 pt-3 border-t border-gray-200 flex gap-4">
           <div class="w-4 bg-amber-400 flex items-center justify-center font-bold text-[10px] text-amber-900 py-6 write-vertical">
             INVENTARIO
@@ -297,9 +299,27 @@
         <button type="submit" id="btn-submit-hidden" class="hidden"></button>
       </form>
 
+      <!-- Panel Derecho: Carga/Captura de Imagen del Producto -->
+      <div class="w-64 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50 shadow-sm mr-8">
+        <span class="font-semibold text-gray-600 mb-2">Imagen del Producto</span>
+        
+        <div onclick="document.getElementById('input-prod-foto').click()" class="w-40 h-40 bg-white border border-gray-300 rounded-md flex flex-col items-center justify-center cursor-pointer hover:border-amber-500 overflow-hidden relative group shadow-inner">
+          <img id="new-prod-img-preview" src="" alt="Previsualización" class="object-contain w-full h-full hidden">
+          <div id="new-prod-img-placeholder" class="text-center p-2">
+            <span class="text-4xl block">🖼️</span>
+            <span class="text-[11px] text-blue-600 font-bold block mt-1">Tomar foto o subir</span>
+          </div>
+        </div>
+
+        <input type="file" id="input-prod-foto" accept="image/*" capture="environment" onchange="procesarFotoSeleccionada(event)" class="hidden">
+        
+        <button type="button" onclick="limpiarFotoProducto()" class="mt-2 text-[11px] text-red-600 hover:underline font-semibold">
+          🗑️ Quitar imagen
+        </button>
+      </div>
+
     </main>
 
-    <!-- Botones Inferiores de Acción -->
     <footer class="bg-[#f0f0f0] border-t border-gray-300 p-2 flex justify-between items-center px-4">
       <button onclick="document.getElementById('form-producto').requestSubmit()" class="btn-action bg-white px-4 py-1.5 rounded text-green-800 font-bold flex items-center gap-1 shadow hover:bg-green-50 border-green-300 cursor-pointer">
         <span>✅</span> Guardar Producto
@@ -312,13 +332,13 @@
 
   </div>
 
-  <!-- Barra de Estado Inferior -->
+  <!-- Barra de Estado -->
   <div class="bg-[#ffffcc] border-t border-gray-300 px-3 py-0.5 text-[11px] text-gray-700 flex justify-between items-center">
     <div>💡 <strong>Punto de Venta</strong> ... Teclee, escanee o utilice la cámara para leer el Código de Barras.</div>
     <div class="text-gray-500 font-mono" id="live-clock">--:-- --</div>
   </div>
 
-  <!-- Modal del Escáner de Cámara para Móviles/Tablets -->
+  <!-- Modal del Escáner de Cámara -->
   <div id="modal-scanner" class="fixed inset-0 bg-black bg-opacity-75 z-50 flex flex-col items-center justify-center p-4 hidden">
     <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-4 flex flex-col items-center">
       <div class="w-full flex justify-between items-center mb-2 border-b pb-2">
@@ -328,7 +348,6 @@
         <button onclick="cerrarEscanerCamara()" class="text-red-600 font-bold text-base px-2">✕</button>
       </div>
       
-      <!-- Contenedor del Visor de Video de la Cámara -->
       <div id="reader" class="w-full bg-black rounded overflow-hidden"></div>
 
       <button onclick="cerrarEscanerCamara()" class="mt-3 bg-gray-200 text-gray-800 px-4 py-1.5 rounded font-bold text-xs w-full">
