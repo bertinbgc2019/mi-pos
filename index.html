@@ -6,6 +6,8 @@
   <title>eleventa POS - PWA</title>
   <link rel="manifest" href="manifest.json">
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Librería para escaneo de código de barras con la cámara -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
     .btn-toolbar { background: linear-gradient(to bottom, #ffffff, #e6e6e6); border: 1px solid #adadad; }
@@ -54,24 +56,30 @@
       <span>VENTA - Ticket 1</span>
     </div>
 
-    <<!-- Sub-barra de Acciones con Visor de Foto del Producto Ampliado -->
+    <!-- Sub-barra de Acciones con Visor de Foto Ampliado y Botón de Cámara -->
     <div class="bg-[#f0f0f0] p-2 border-b border-gray-300 flex items-center gap-3">
-      <!-- Visor de imagen agrandado a 80x80px (w-20 h-20) -->
+      <!-- Visor de foto del producto (80x80px) -->
       <div class="w-20 h-20 bg-white border border-gray-400 rounded-md flex items-center justify-center overflow-hidden shadow-inner flex-shrink-0">
         <img id="product-preview-img" src="" alt="Producto" class="object-contain w-full h-full hidden">
         <span id="product-preview-placeholder" class="text-gray-400 text-3xl">📷</span>
       </div>
 
-      <!-- Campo de entrada y botones de acción -->
+      <!-- Entradas y Botones de Acción -->
       <div class="flex-1 flex flex-wrap items-center gap-2">
         <div class="flex items-center gap-2">
           <span class="font-bold text-gray-700 text-sm">Producto:</span>
-          <input type="text" id="barcode-input" autofocus class="border border-gray-400 p-1.5 rounded w-72 text-base font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-inner">
+          <input type="text" id="barcode-input" autofocus class="border border-gray-400 p-1.5 rounded w-60 text-base font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-inner">
         </div>
         
         <button onclick="buscarProducto()" class="btn-action px-3 py-1.5 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm text-xs">
-          <span>🛒</span> ENTER - Agregar Producto
+          <span>🛒</span> ENTER - Agregar
         </button>
+
+        <!-- Botón para Escanear con Cámara (Teléfonos / Tabletas) -->
+        <button onclick="abrirEscanerCamara()" class="btn-action px-3 py-1.5 rounded text-blue-900 bg-blue-50 border-blue-400 font-bold flex items-center gap-1 shadow-sm text-xs hover:bg-blue-100">
+          <span class="text-base">📷</span> Escanear con Cámara
+        </button>
+
         <button onclick="buscarProductoPrompt()" class="btn-action px-3 py-1.5 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm text-xs">
           <span class="text-blue-600">🔍 F10</span> Buscar
         </button>
@@ -80,6 +88,7 @@
         </button>
       </div>
     </div>
+
     <!-- Pestañas de Tickets -->
     <div class="bg-[#d6d6d6] px-2 pt-1 flex items-center gap-1 border-b border-gray-400">
       <div class="bg-white border-t-2 border-t-blue-600 border-x border-gray-400 px-3 py-1 font-bold rounded-t text-gray-800 flex items-center gap-1 shadow">
@@ -101,7 +110,7 @@
           </tr>
         </thead>
         <tbody id="cart-rows" class="divide-y divide-gray-200">
-          <!-- Se genera dinámicamente -->
+          <!-- Contenido generado por app.js -->
         </tbody>
       </table>
     </main>
@@ -183,7 +192,7 @@
       NUEVO / MODIFICAR PRODUCTO
     </div>
 
-    <!-- Formularios y Contenido de Producto -->
+    <!-- Formulario de Alta de Producto -->
     <main class="flex-1 bg-white p-4 overflow-y-auto text-gray-800">
       
       <form id="form-producto" onsubmit="guardarNuevoProducto(event)" class="max-w-4xl space-y-3">
@@ -303,10 +312,29 @@
 
   </div>
 
-  <!-- 8. Barra de Estado Inferior -->
+  <!-- Barra de Estado Inferior -->
   <div class="bg-[#ffffcc] border-t border-gray-300 px-3 py-0.5 text-[11px] text-gray-700 flex justify-between items-center">
-    <div>💡 <strong>Punto de Venta</strong> ... Teclee o escanee el Código del Producto.</div>
+    <div>💡 <strong>Punto de Venta</strong> ... Teclee, escanee o use la cámara para el Código del Producto.</div>
     <div class="text-gray-500 font-mono" id="live-clock">--:-- --</div>
+  </div>
+
+  <!-- Modal del Escáner de Cámara para Móviles/Tablets -->
+  <div id="modal-scanner" class="fixed inset-0 bg-black bg-opacity-75 z-50 flex flex-col items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-4 flex flex-col items-center">
+      <div class="w-full flex justify-between items-center mb-2 border-b pb-2">
+        <h3 class="font-bold text-gray-800 text-sm flex items-center gap-1">
+          <span>📷</span> Escaneando Código de Barras
+        </h3>
+        <button onclick="cerrarEscanerCamara()" class="text-red-600 font-bold text-base px-2">✕</button>
+      </div>
+      
+      <!-- Contenedor del Visor de Video de la Cámara -->
+      <div id="reader" class="w-full bg-black rounded overflow-hidden"></div>
+
+      <button onclick="cerrarEscanerCamara()" class="mt-3 bg-gray-200 text-gray-800 px-4 py-1.5 rounded font-bold text-xs w-full">
+        Cancelar / Cerrar
+      </button>
+    </div>
   </div>
 
   <!-- Pantalla de Bloqueo por Membresía Vencida -->
