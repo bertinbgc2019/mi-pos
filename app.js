@@ -6,10 +6,8 @@ const productosDefault = [
   { id: '4', codigo: '75010004', nombre: 'Cuaderno Profesional', precio: 35.00, stock: 12, costo: 25.00, imagen: '' }
 ];
 
-// CONFIGURACIÓN DE MEMBRESÍA (Año-Mes-Día)
 const FECHA_VENCIMIENTO_LICENCIA = "2026-09-30"; 
 
-// Obtener catálogo almacenado
 function obtenerProductosDB() {
   const db = localStorage.getItem('eleventa_productos');
   if (!db) {
@@ -23,6 +21,8 @@ let productosBase = obtenerProductosDB();
 let carrito = [];
 let itemSeleccionadoIndex = null;
 let html5QrCode = null;
+let targetInputId = 'barcode-input'; // Elemento donde se escribe el código leído
+let imagenProductoTemporal = ''; // Guardar base64 de la foto
 
 document.addEventListener('DOMContentLoaded', () => {
   registrarServiceWorker();
@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const barcodeInput = document.getElementById('barcode-input');
   if (barcodeInput) barcodeInput.focus();
 
-  // Escaneo automático con Enter
   if (barcodeInput) {
     barcodeInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
@@ -42,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Atajos de teclado estilo eleventa (F1, F3, F10, F12, Supr)
   document.addEventListener('keydown', (e) => {
     if (e.key === 'F1') {
       e.preventDefault();
@@ -62,10 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Verificación de Membresía
 async function verificarEstadoMembresia() {
   let fechaActual;
-
   try {
     const res = await fetch('https://worldtimeapi.org/api/ip', { cache: "no-store" });
     const data = await res.json();
@@ -75,7 +71,6 @@ async function verificarEstadoMembresia() {
   }
 
   const fechaLimite = new Date(FECHA_VENCIMIENTO_LICENCIA + "T23:59:59");
-
   if (fechaActual > fechaLimite) {
     bloquearSistema();
   }
@@ -83,16 +78,13 @@ async function verificarEstadoMembresia() {
 
 function bloquearSistema() {
   const modal = document.getElementById('modal-licencia-bloqueo');
-  if (modal) {
-    modal.classList.remove('hidden');
-  }
+  if (modal) modal.classList.remove('hidden');
   document.onkeydown = (e) => {
     e.stopPropagation();
     return false;
   };
 }
 
-// Navegación entre Módulos Ventas (F1) y Productos (F3)
 function cambiarModulo(modulo) {
   const modVentas = document.getElementById('modulo-ventas');
   const modProductos = document.getElementById('modulo-productos');
@@ -114,7 +106,6 @@ function cambiarModulo(modulo) {
   }
 }
 
-// Visor de Imagen de Producto
 function mostrarImagenProducto(imagenUrl) {
   const imgEl = document.getElementById('product-preview-img');
   const placeholderEl = document.getElementById('product-preview-placeholder');
@@ -129,7 +120,6 @@ function mostrarImagenProducto(imagenUrl) {
   }
 }
 
-// Ventas y Carrito
 function buscarProducto() {
   const input = document.getElementById('barcode-input');
   const valor = input.value.trim();
@@ -274,14 +264,14 @@ function reimprimirUltimoTicket() {
   alert(`REIMPRESIÓN ÚLTIMO TICKET\nID Venta: ${ultimaVenta.id}\nTotal: $${ultimaVenta.total.toFixed(2)}\nPago: $${ultimaVenta.pago.toFixed(2)}\nCambio: $${ultimaVenta.cambio.toFixed(2)}`);
 }
 
-// ==================== LÓGICA DE ESCÁNER DE CÁMARA OPTIMIZADA ====================
+// ==================== LÓGICA DE ESCÁNER DE CÁMARA ====================
 
-function abrirEscanerCamara() {
+function abrirEscanerCamara(inputId = 'barcode-input') {
+  targetInputId = inputId; // Define en qué input escribirá el resultado
   const modal = document.getElementById('modal-scanner');
   modal.classList.remove('hidden');
 
   if (!html5QrCode) {
-    // Declaración explícita de formatos de códigos de barras (1D y 2D)
     const formatsToSupport = [
       Html5QrcodeSupportedFormats.EAN_13,
       Html5QrcodeSupportedFormats.EAN_8,
@@ -295,15 +285,14 @@ function abrirEscanerCamara() {
     html5QrCode = new Html5Qrcode("reader", { formatsToSupport: formatsToSupport });
   }
 
-  // Configuración de enfoque, alta resolución (HD) y área rectangular horizontal
   const config = { 
     fps: 15, 
-    qrbox: { width: 280, height: 140 }, // Área amplia para barras largas
+    qrbox: { width: 280, height: 140 },
     videoConstraints: {
-      facingMode: "environment", // Lente trasera principal
+      facingMode: "environment",
       width: { min: 640, ideal: 1280, max: 1920 },
       height: { min: 480, ideal: 720, max: 1080 },
-      focusMode: "continuous" // Fuerza autoenfoque continuo
+      focusMode: "continuous"
     }
   };
 
@@ -319,9 +308,16 @@ function abrirEscanerCamara() {
 }
 
 function onScanSuccess(decodedText, decodedResult) {
-  document.getElementById('barcode-input').value = decodedText;
+  const targetInput = document.getElementById(targetInputId);
+  if (targetInput) {
+    targetInput.value = decodedText;
+  }
+  
   cerrarEscanerCamara();
-  buscarProducto();
+
+  if (targetInputId === 'barcode-input') {
+    buscarProducto();
+  }
   
   if ('vibrate' in navigator) {
     navigator.vibrate(100);
@@ -329,7 +325,7 @@ function onScanSuccess(decodedText, decodedResult) {
 }
 
 function onScanFailure(error) {
-  // Proceso continuo de enfoque y lectura en segundo plano
+  // Proceso continuo de escaneo
 }
 
 function cerrarEscanerCamara() {
@@ -345,7 +341,32 @@ function cerrarEscanerCamara() {
   }
 }
 
-// ==================== LÓGICA DE PRODUCTOS ====================
+// ==================== LÓGICA DE PRODUCTOS E IMÁGENES ====================
+
+function procesarFotoSeleccionada(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    imagenProductoTemporal = e.target.result;
+    
+    const preview = document.getElementById('new-prod-img-preview');
+    const placeholder = document.getElementById('new-prod-img-placeholder');
+    
+    preview.src = imagenProductoTemporal;
+    preview.classList.remove('hidden');
+    placeholder.classList.add('hidden');
+  };
+  reader.readAsDataURL(file);
+}
+
+function limpiarFotoProducto() {
+  imagenProductoTemporal = '';
+  document.getElementById('input-prod-foto').value = '';
+  document.getElementById('new-prod-img-preview').classList.add('hidden');
+  document.getElementById('new-prod-img-placeholder').classList.remove('hidden');
+}
 
 function calcularPrecioVenta() {
   const costo = parseFloat(document.getElementById('prod-costo').value) || 0;
@@ -379,7 +400,6 @@ function guardarNuevoProducto(event) {
   const stock = usaInv ? (parseInt(document.getElementById('prod-stock').value) || 0) : 999;
 
   let db = obtenerProductosDB();
-
   const indexExistente = db.findIndex(p => p.codigo === codigo);
 
   const nuevoProd = {
@@ -390,7 +410,8 @@ function guardarNuevoProducto(event) {
     costo: costo,
     mayoreo: mayoreo,
     departamento: depto,
-    stock: stock
+    stock: stock,
+    imagen: imagenProductoTemporal || (indexExistente >= 0 ? db[indexExistente].imagen : '')
   };
 
   if (indexExistente >= 0) {
@@ -410,10 +431,10 @@ function guardarNuevoProducto(event) {
 
 function limpiarFormularioProducto() {
   document.getElementById('form-producto').reset();
+  limpiarFotoProducto();
   toggleInventarioInputs(true);
 }
 
-// Utilidades
 function iniciarReloj() {
   const clockEl = document.getElementById('live-clock');
   setInterval(() => {
