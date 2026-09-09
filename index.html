@@ -3,148 +3,206 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>eleventa POS - PWA</title>
+  <title>G-Net Punto de Venta</title>
   <link rel="manifest" href="manifest.json">
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Librería para escaneo de código de barras -->
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
-    .btn-toolbar { background: linear-gradient(to bottom, #ffffff, #e6e6e6); border: 1px solid #adadad; }
-    .btn-toolbar:hover { background: linear-gradient(to bottom, #e6e6e6, #cccccc); }
-    .btn-toolbar.active { background: linear-gradient(to bottom, #dbeafe, #bfdbfe); border-color: #3b82f6; font-weight: bold; }
-    .btn-action { background: linear-gradient(to bottom, #ffffff, #f0f0f0); border: 1px solid #bcbcbc; }
-    .btn-action:hover { background: #e2e8f0; }
-    .th-eleventa { background-color: #e4e4e4; border-right: 1px solid #c0c0c0; border-bottom: 1px solid #c0c0c0; }
-    .subnav-btn { background: linear-gradient(to bottom, #ffffff, #f1f5f9); border: 1px solid #cbd5e1; }
-    .subnav-btn:hover { background: #e2e8f0; }
-    .subnav-btn.active { background: #ffffff; border-bottom: 2px solid #d97706; font-weight: bold; }
+    .bg-gnet-dark { background-color: #1e2952; }
+    .bg-gnet-top { background-color: #162042; }
+    .bg-gnet-table-header { background-color: #abb2cb; }
+    .btn-top-nav { background-color: #ffffff; color: #1e2952; font-weight: 600; border-radius: 6px; }
+    .btn-top-nav:hover { background-color: #e2e8f0; }
+    .btn-top-nav.active { background-color: #3b82f6; color: #ffffff; }
+    .btn-action-gnet { background-color: #ffffff; color: #1e2952; border-radius: 6px; font-weight: 600; }
+    .btn-action-gnet:hover { background-color: #e2e8f0; }
   </style>
 </head>
-<body class="bg-[#f0f0f0] text-gray-800 h-screen flex flex-col justify-between overflow-hidden text-xs">
+<body class="bg-gnet-dark text-white h-screen flex flex-col justify-between overflow-hidden text-xs">
 
-  <!-- Encabezado Superior -->
-  <header class="bg-[#f5f5f5] border-b border-gray-300 p-1 flex justify-between items-center">
-    <div class="flex items-center gap-1 overflow-x-auto">
-      <div class="flex items-center gap-1 font-bold text-base px-2 text-blue-900 border-r border-gray-300 pr-3">
-        <span class="text-xl">🖥️</span> eleventa<span class="text-xs align-super">®</span>
+  <!-- Encabezado Principal G-Net -->
+  <header class="bg-gnet-top px-4 py-2 flex justify-between items-center border-b border-blue-900">
+    <div class="flex items-center gap-6">
+      <!-- Logo G-Net -->
+      <div class="flex items-center gap-2">
+        <span class="text-3xl">🛒</span>
+        <div>
+          <h1 class="text-2xl font-black tracking-wider text-white leading-none">G-Net</h1>
+          <div class="w-full h-0.5 bg-blue-400 my-0.5"></div>
+        </div>
       </div>
-      <button id="nav-ventas" onclick="cambiarModulo('ventas')" class="btn-toolbar active px-2 py-1 rounded flex items-center gap-1 text-gray-700 shadow-sm cursor-pointer">
-        <span class="text-blue-600">🏷️ F1</span> Ventas
-      </button>
-      <button id="nav-creditos" onclick="cambiarModulo('creditos')" class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600"><span class="text-blue-600">💸 F2</span> Créditos</button>
-      <button id="nav-clientes" onclick="cambiarModulo('clientes')" class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600"><span class="text-blue-600">👥</span> Clientes</button>
-      <button id="nav-productos" onclick="cambiarModulo('productos')" class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600 cursor-pointer">
-        <span class="text-blue-600">📦 F3</span> Productos
-      </button>
-      <button id="nav-inventario" onclick="cambiarModulo('inventario')" class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600"><span class="text-blue-600">📋 F4</span> Inventario</button>
-      <button class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600"><span class="text-blue-600">🚚</span> Compras</button>
-      <button id="nav-config" onclick="cambiarModulo('config')" class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600 cursor-pointer">
-        <span class="text-blue-600">⚙️</span> Configuración
-      </button>
-      <button class="btn-toolbar px-2 py-1 rounded flex items-center gap-1 text-gray-600"><span class="text-blue-600">📊</span> Reportes</button>
+
+      <!-- Menú Superior de Navegación -->
+      <nav class="flex items-center gap-2 overflow-x-auto">
+        <button id="nav-ventas" onclick="cambiarModulo('ventas')" class="btn-top-nav active px-3 py-1.5 flex items-center gap-1.5 shadow">
+          <span>🛒</span> F1 Ventas
+        </button>
+        <button id="nav-creditos" onclick="cambiarModulo('creditos')" class="btn-top-nav px-3 py-1.5 flex items-center gap-1.5 shadow">
+          <span>💲</span> F2 Créditos
+        </button>
+        <button id="nav-clientes" onclick="cambiarModulo('clientes')" class="btn-top-nav px-3 py-1.5 flex items-center gap-1.5 shadow">
+          <span>👥</span> F3 Clientes
+        </button>
+        <button id="nav-productos" onclick="cambiarModulo('productos')" class="btn-top-nav px-3 py-1.5 flex items-center gap-1.5 shadow">
+          <span>📦</span> F4 Productos
+        </button>
+        <button id="nav-inventario" onclick="cambiarModulo('inventario')" class="btn-top-nav px-3 py-1.5 flex items-center gap-1.5 shadow">
+          <span>📋</span> F5 Inventario
+        </button>
+        <button class="btn-top-nav px-3 py-1.5 flex items-center gap-1.5 shadow">
+          <span>🚚</span> Compras
+        </button>
+        <button class="btn-top-nav px-3 py-1.5 flex items-center gap-1.5 shadow">
+          <span>📊</span> Reportes
+        </button>
+      </nav>
     </div>
-    <div class="text-right pl-2 pr-2">
-      <div class="text-[10px] text-gray-500 font-bold">Le atiende:</div>
-      <div class="font-bold text-gray-800 text-sm">BERTIN GARCIA CRUZ</div>
+
+    <!-- Usuario Activo -->
+    <div class="flex items-center gap-2 font-bold text-sm">
+      <span>(BERTIN GARCIA CRUZ)</span>
+      <span class="text-2xl">👤</span>
     </div>
   </header>
 
-  <!-- ==================== MÓDULO 1: VENTAS ==================== -->
-  <div id="modulo-ventas" class="flex-1 flex flex-col justify-between overflow-hidden">
-    
-    <div class="bg-[#2c5282] text-white px-3 py-1 font-bold text-sm shadow-inner flex justify-between items-center">
-      <span>VENTA - Ticket 1</span>
-    </div>
+  <!-- Titulo de la Ventana Activa -->
+  <div class="bg-gnet-dark px-4 py-1 text-white font-bold text-sm tracking-wide border-b border-blue-900">
+    VENTA-TICKET 1
+  </div>
 
-    <!-- Sub-barra de Acciones -->
-    <div class="bg-[#f0f0f0] p-2 border-b border-gray-300 flex items-center gap-3">
-      <!-- Visor de foto del producto -->
-      <div class="w-20 h-20 bg-white border border-gray-400 rounded-md flex items-center justify-center overflow-hidden shadow-inner flex-shrink-0">
-        <img id="product-preview-img" src="" alt="Producto" class="object-contain w-full h-full hidden">
-        <span id="product-preview-placeholder" class="text-gray-400 text-3xl">📷</span>
+  <!-- ==================== MÓDULO 1: VENTAS ==================== -->
+  <div id="modulo-ventas" class="flex-1 flex flex-col justify-between overflow-hidden p-2 gap-2">
+
+    <!-- Barra Superior de Búsqueda y Botones Rápidos -->
+    <div class="flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2 flex-1">
+        <!-- Vista previa imagen -->
+        <div class="w-14 h-14 bg-white rounded flex items-center justify-center text-gray-400 font-bold text-[9px] text-center border p-1 text-black">
+          IMAGEN DEL PRODUCTO
+        </div>
+
+        <!-- Entrada del Código de Barras -->
+        <span class="font-bold text-sm text-white">PRODUCTO:</span>
+        <input type="text" id="barcode-input" placeholder="(CAMPO DE CODIGO PRODUCTO)" autofocus class="bg-white text-black font-semibold px-3 py-2 rounded w-80 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+        
+        <button onclick="toggleCamara()" class="btn-action-gnet p-2 text-lg shadow" title="Escanear con Cámara">
+          📷
+        </button>
       </div>
 
-      <!-- Entradas y Botones -->
-      <div class="flex-1 flex flex-wrap items-center gap-2">
+      <!-- Botones Rápidos Superiores -->
+      <div class="flex items-center gap-1.5">
+        <button onclick="limpiarCarrito()" class="btn-action-gnet px-2.5 py-1.5 text-xs shadow">DEL Borrar carrito</button>
+        <button class="btn-action-gnet px-2.5 py-1.5 text-xs shadow flex items-center gap-1">🏷️ F11 Mayoreo</button>
+        <button class="btn-action-gnet px-2.5 py-1.5 text-xs shadow flex items-center gap-1">📥 F7 Entradas</button>
+        <button class="btn-action-gnet px-2.5 py-1.5 text-xs shadow flex items-center gap-1">📤 F8 Salidas</button>
+        <button class="btn-action-gnet px-2.5 py-1.5 text-xs shadow flex items-center gap-1">🔍 F9 Verificador</button>
+      </div>
+    </div>
+
+    <!-- Área Central (Paneles Izquierdo y Derecho) -->
+    <div class="flex-1 flex gap-2 overflow-hidden">
+      
+      <!-- Panel Izquierdo: Catálogo Visual / Búsqueda Rápida -->
+      <div class="w-72 bg-slate-200 text-black p-2 rounded flex flex-col gap-2 overflow-hidden">
         <div class="flex items-center gap-1">
-          <span class="font-bold text-gray-700 text-sm">Producto:</span>
-          <input type="text" id="barcode-input" autofocus class="border border-gray-400 p-1.5 rounded w-60 text-base font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-inner">
-          
-          <!-- Icono Cámara Ventas -->
-          <button type="button" onclick="toggleCamara()" title="Escanear Código con Cámara" class="btn-action p-1.5 rounded text-blue-900 bg-blue-50 border-blue-400 font-bold shadow-sm hover:bg-blue-100 cursor-pointer text-base">
-            📷
-          </button>
+          <span class="font-bold text-[10px] uppercase">BUSCAR PRODUCTO:</span>
+          <input type="text" class="border border-gray-400 rounded px-1.5 py-0.5 text-xs flex-1">
+        </div>
+
+        <!-- Cuadrícula de Accesos Directos a Productos -->
+        <div class="flex-1 grid grid-cols-3 gap-1.5 overflow-y-auto">
+          <div class="bg-white border-2 border-slate-400 rounded p-1 flex items-center justify-center text-center text-[9px] font-bold cursor-pointer hover:bg-blue-50">IMAGEN DEL PRODUCTO</div>
+          <div class="bg-white border-2 border-slate-400 rounded p-1 flex items-center justify-center text-center text-[9px] font-bold cursor-pointer hover:bg-blue-50">IMAGEN DEL PRODUCTO</div>
+          <div class="bg-white border-2 border-slate-400 rounded p-1 flex items-center justify-center text-center text-[9px] font-bold cursor-pointer hover:bg-blue-50">IMAGEN DEL PRODUCTO</div>
+          <div class="bg-white border-2 border-slate-400 rounded p-1 flex items-center justify-center text-center text-[9px] font-bold cursor-pointer hover:bg-blue-50">IMAGEN DEL PRODUCTO</div>
+          <div class="bg-white border-2 border-slate-400 rounded p-1 flex items-center justify-center text-center text-[9px] font-bold cursor-pointer hover:bg-blue-50">IMAGEN DEL PRODUCTO</div>
+          <div class="bg-white border-2 border-slate-400 rounded p-1 flex items-center justify-center text-center text-[9px] font-bold cursor-pointer hover:bg-blue-50">IMAGEN DEL PRODUCTO</div>
+          <div class="bg-white border-2 border-slate-400 rounded p-1 flex items-center justify-center text-center text-[9px] font-bold cursor-pointer hover:bg-blue-50">IMAGEN DEL PRODUCTO</div>
+          <div class="bg-white border-2 border-slate-400 rounded p-1 flex items-center justify-center text-center text-[9px] font-bold cursor-pointer hover:bg-blue-50">IMAGEN DEL PRODUCTO</div>
+          <div class="bg-white border-2 border-slate-400 rounded p-1 flex items-center justify-center text-center text-[9px] font-bold cursor-pointer hover:bg-blue-50">IMAGEN DEL PRODUCTO</div>
+        </div>
+      </div>
+
+      <!-- Panel Derecho: Tabla del Carrito -->
+      <div class="flex-1 bg-white text-black rounded flex flex-col overflow-hidden">
+        <div class="bg-slate-300 px-3 py-1 text-slate-700 font-bold text-xs border-b">
+          TICKET 1
         </div>
         
-        <button onclick="buscarProductoPorCodigo(document.getElementById('barcode-input').value)" class="btn-action px-3 py-1.5 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm text-xs">
-          <span>🛒</span> ENTER - Agregar
-        </button>
+        <div class="flex-1 overflow-y-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-gnet-table-header text-slate-800 font-bold text-xs">
+                <th class="p-2 border-r border-slate-400">CÓDIGO DE BARRAS</th>
+                <th class="p-2 border-r border-slate-400">DESCRIPCIÓN DEL PRODUCTO</th>
+                <th class="p-2 border-r border-slate-400 text-right">PRECIO</th>
+                <th class="p-2 border-r border-slate-400 text-center">CANTIDAD</th>
+                <th class="p-2 border-r border-slate-400 text-right">IMPORTE</th>
+                <th class="p-2 text-center">EXISTENCIA</th>
+              </tr>
+            </thead>
+            <tbody id="carrito-body" class="divide-y divide-gray-200 text-xs font-semibold">
+              <!-- Elementos del carrito cargados por JS -->
+            </tbody>
+          </table>
+        </div>
 
-        <button onclick="limpiarCarrito()" class="btn-action px-3 py-1.5 rounded text-gray-700 font-semibold flex items-center gap-1 shadow-sm text-xs">
-          <span class="text-red-600">🗑️ DEL</span> Borrar Carrito
-        </button>
+        <div class="bg-slate-300 px-3 py-1 text-slate-700 font-bold text-xs border-t">
+          0 Productos en la Venta actual
+        </div>
       </div>
+
     </div>
 
-    <!-- Tabla Principal de Artículos -->
-    <main class="flex-1 bg-white overflow-y-auto">
-      <table class="w-full text-left border-collapse">
-        <thead>
-          <tr class="text-gray-700 font-semibold text-xs border-b border-gray-300">
-            <th class="th-eleventa p-1.5">Descripción del Producto</th>
-            <th class="th-eleventa p-1.5 text-center w-24">Cant.</th>
-            <th class="th-eleventa p-1.5 text-right w-24">Precio</th>
-            <th class="th-eleventa p-1.5 text-right w-24 bg-[#eaf4ea]">Subtotal</th>
-            <th class="th-eleventa p-1.5 text-center w-16">Acción</th>
-          </tr>
-        </thead>
-        <tbody id="carrito-body" class="divide-y divide-gray-200">
-          <!-- Contenido dinámico del carrito -->
-        </tbody>
-      </table>
-    </main>
+    <!-- Panel Inferior: Acciones secundarias y Total -->
+    <div class="flex justify-between items-center gap-2">
+      <!-- Botones Inferiores -->
+      <div class="flex items-center gap-1.5">
+        <button class="btn-action-gnet px-3 py-2 text-xs flex items-center gap-1">🔄 F5 CAMBIAR</button>
+        <button class="btn-action-gnet px-3 py-2 text-xs">F6 PENDIENTE</button>
+        <button onclick="limpiarCarrito()" class="btn-action-gnet px-3 py-2 text-xs">ELIMINAR</button>
+        <button class="btn-action-gnet px-3 py-2 text-xs">ASIGNAR CLIENTE</button>
+        <button class="btn-action-gnet px-3 py-2 text-xs">Ventas del día</button>
+        <button class="btn-action-gnet px-3 py-2 text-xs">Reimp. Ticket</button>
+      </div>
 
-    <!-- Panel Inferior de Pago -->
-    <footer class="bg-[#e6e6e6] border-t border-gray-400 p-2 flex justify-between items-center">
-      <div>
-        <button onclick="procesarCobro()" class="btn-action bg-white border border-gray-400 text-blue-900 font-bold text-sm px-6 py-2 rounded shadow hover:bg-blue-50">
-          🛒 F12 - Cobrar
+      <!-- Botón Cobrar y Gran Total -->
+      <div class="flex items-center gap-2">
+        <button onclick="procesarCobro()" class="bg-white text-slate-900 font-black text-lg px-8 py-3 rounded shadow hover:bg-slate-100 uppercase tracking-wide">
+          F12 COBRAR
         </button>
+        
+        <div class="bg-white text-black px-6 py-1.5 rounded text-right shadow min-w-[200px]">
+          <span id="total-pagar" class="text-4xl font-black font-mono">$ 0.00</span>
+        </div>
       </div>
-      <div class="bg-[#f8fafc] border border-gray-300 rounded p-2 text-right shadow-inner">
-        <span class="text-gray-500 text-[10px] uppercase font-bold tracking-wider">Total a Cobrar</span>
-        <div id="total-pagar" class="text-3xl font-bold text-[#1e3a8a] font-mono">$0.00</div>
-      </div>
-    </footer>
+    </div>
 
   </div>
 
   <!-- ==================== MÓDULO 2: PRODUCTOS ==================== -->
-  <div id="modulo-productos" class="flex-1 flex flex-col justify-between overflow-hidden hidden">
-    <div class="bg-[#c28e2b] text-white px-3 py-1 font-bold text-sm shadow-inner">
-      PRODUCTOS
-    </div>
-
-    <main class="flex-1 bg-white p-4 overflow-y-auto flex gap-6">
+  <div id="modulo-productos" class="flex-1 flex flex-col justify-between overflow-hidden p-4 hidden">
+    <div class="bg-white text-black rounded p-4 flex-1 flex gap-6 overflow-hidden">
       <!-- Formulario -->
       <form id="form-producto" onsubmit="guardarProducto(event)" class="w-1/2 space-y-3 border-r pr-4 border-gray-200">
-        <h3 class="font-bold text-amber-700 text-sm border-b pb-1">Alta / Edición de Producto</h3>
+        <h3 class="font-bold text-blue-900 text-sm border-b pb-1">Alta / Edición de Producto</h3>
         
         <div>
           <label class="block font-semibold">Código de Barras:</label>
-          <input type="text" id="prod-codigo" required class="border border-gray-400 p-1 rounded w-full font-mono">
+          <input type="text" id="prod-codigo" required class="border border-gray-400 p-1 rounded w-full font-mono text-black">
         </div>
 
         <div>
           <label class="block font-semibold">Nombre / Descripción:</label>
-          <input type="text" id="prod-nombre" required class="border border-gray-400 p-1 rounded w-full">
+          <input type="text" id="prod-nombre" required class="border border-gray-400 p-1 rounded w-full text-black">
         </div>
 
         <div class="grid grid-cols-3 gap-2">
           <div>
             <label class="block font-semibold">Costo:</label>
-            <input type="number" step="0.01" id="prod-costo" class="border border-gray-400 p-1 rounded w-full font-mono">
+            <input type="number" step="0.01" id="prod-costo" class="border border-gray-400 p-1 rounded w-full font-mono text-black">
           </div>
           <div>
             <label class="block font-semibold">Precio Venta:</label>
@@ -152,12 +210,12 @@
           </div>
           <div>
             <label class="block font-semibold">Stock Inicial:</label>
-            <input type="number" id="prod-stock" value="10" class="border border-gray-400 p-1 rounded w-full font-mono">
+            <input type="number" id="prod-stock" value="10" class="border border-gray-400 p-1 rounded w-full font-mono text-black">
           </div>
         </div>
 
         <div class="flex gap-2 pt-2">
-          <button type="submit" id="btn-guardar-producto" class="bg-green-700 text-white font-bold px-4 py-1.5 rounded hover:bg-green-800">
+          <button type="submit" id="btn-guardar-producto" class="bg-blue-900 text-white font-bold px-4 py-1.5 rounded hover:bg-blue-800">
             Guardar Producto
           </button>
           <button type="button" onclick="limpiarFormularioProducto()" class="bg-gray-300 text-gray-800 font-bold px-4 py-1.5 rounded hover:bg-gray-400">
@@ -180,22 +238,25 @@
             </tr>
           </thead>
           <tbody id="productos-body" class="divide-y divide-gray-200 text-xs">
-            <!-- Productos renderizados dinámicamente -->
+            <!-- Productos -->
           </tbody>
         </table>
       </div>
-    </main>
+    </div>
   </div>
 
-  <!-- Barra de Estado -->
-  <div class="bg-[#ffffcc] border-t border-gray-300 px-3 py-0.5 text-[11px] text-gray-700 flex justify-between items-center">
-    <div>💡 Sistema Punto de Venta Listo.</div>
-    <div class="text-gray-500 font-mono" id="live-clock">--:-- --</div>
-  </div>
+  <!-- Barra de Estado Inferior -->
+  <footer class="bg-slate-300 text-slate-800 px-3 py-1 text-[11px] font-semibold flex justify-between items-center border-t border-slate-400">
+    <div>G-Net Punto de Venta... Teclee o escanee el Código de Producto</div>
+    <div class="flex gap-4 font-mono">
+      <span>09-Sep</span>
+      <span id="live-clock">03:30:31 pm</span>
+    </div>
+  </footer>
 
-  <!-- Contenedor Modal de Escáner -->
+  <!-- Modal Cámara -->
   <div id="reader-container" class="fixed inset-0 bg-black bg-opacity-75 z-50 flex flex-col items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-4 flex flex-col items-center">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-4 flex flex-col items-center text-black">
       <div class="w-full flex justify-between items-center mb-2 border-b pb-2">
         <h3 class="font-bold text-gray-800 text-sm">📷 Escanear Código</h3>
         <button onclick="toggleCamara()" class="text-red-600 font-bold text-base px-2">✕</button>
