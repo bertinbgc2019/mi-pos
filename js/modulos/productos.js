@@ -1,98 +1,56 @@
-// js/modulos/productos.js - Gestión de Catálogo de Productos
+let productos = JSON.parse(localStorage.getItem('gnet_productos')) || [];
 
-function guardarProducto(event) {
-  if (event) event.preventDefault();
+function guardarProducto(e) {
+  e.preventDefault();
 
-  const codigo = document.getElementById('prod-codigo').value.trim();
-  const nombre = document.getElementById('prod-nombre').value.trim();
-  const precio = parseFloat(document.getElementById('prod-precio').value);
-  const costo = parseFloat(document.getElementById('prod-costo').value) || 0;
-  const stock = parseInt(document.getElementById('prod-stock').value) || 0;
+  const codigoInput = document.getElementById('prod-codigo').value.trim();
+  const nombreInput = document.getElementById('prod-nombre').value.trim();
+  const precioInput = parseFloat(document.getElementById('prod-precio').value) || 0;
+  const stockInput = parseInt(document.getElementById('prod-stock').value) || 0;
+  const deptoInput = document.getElementById('prod-depto').value;
 
-  if (!codigo || !nombre || isNaN(precio)) {
-    alert('Por favor completa los campos obligatorios: Código, Nombre y Precio.');
+  if (!codigoInput || !nombreInput) {
+    alert("Por favor ingrese el código de barras y la descripción del producto.");
     return;
   }
 
-  if (productoSeleccionadoIndex >= 0) {
-    // Editar producto existente
-    productos[productoSeleccionadoIndex] = {
-      ...productos[productoSeleccionadoIndex],
-      codigo,
-      nombre,
-      precio,
-      costo,
-      stock
-    };
-    alert('Producto actualizado con éxito');
+  // Comprobar si existe para actualizar o crear nuevo
+  const indexExistente = productos.findIndex(p => p.codigo === codigoInput);
+
+  const nuevoProducto = {
+    id: indexExistente >= 0 ? productos[indexExistente].id : Date.now().toString(),
+    codigo: codigoInput, // CÓDIGO DE BARRAS
+    nombre: nombreInput, // DESCRIPCIÓN
+    precio: precioInput,
+    costo: parseFloat(document.getElementById('prod-costo').value) || 0,
+    mayoreo: parseFloat(document.getElementById('prod-mayoreo').value) || 0,
+    stock: stockInput,
+    departamento: deptoInput
+  };
+
+  if (indexExistente >= 0) {
+    productos[indexExistente] = nuevoProducto;
   } else {
-    // Crear nuevo producto
-    const nuevoProducto = {
-      id: Date.now(),
-      codigo,
-      nombre,
-      precio,
-      costo,
-      stock
-    };
     productos.push(nuevoProducto);
-    alert('Producto agregado con éxito');
   }
 
-  guardarLocalStorage();
+  // Guardar en Storage
+  localStorage.setItem('gnet_productos', JSON.stringify(productos));
+  alert("Producto guardado correctamente.");
   limpiarFormularioProducto();
-  actualizarTablaProductos();
 }
 
-function actualizarTablaProductos() {
-  const tbody = document.getElementById('productos-body');
-  if (!tbody) return;
-
-  tbody.innerHTML = '';
-
-  productos.forEach((prod, index) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="p-2 font-mono">${prod.codigo}</td>
-      <td class="p-2 font-medium">${prod.nombre}</td>
-      <td class="p-2 text-right">$${prod.precio.toFixed(2)}</td>
-      <td class="p-2 text-right">${prod.stock}</td>
-      <td class="p-2 text-center space-x-2">
-        <button onclick="editarProducto(${index})" class="bg-yellow-500 text-white px-2 py-1 rounded text-xs hover:bg-yellow-600">✏️ Editar</button>
-        <button onclick="eliminarProducto(${index})" class="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700">🗑️ Eliminar</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-function editarProducto(index) {
-  const prod = productos[index];
-  productoSeleccionadoIndex = index;
-
-  document.getElementById('prod-codigo').value = prod.codigo;
-  document.getElementById('prod-nombre').value = prod.nombre;
-  document.getElementById('prod-precio').value = prod.precio;
-  document.getElementById('prod-costo').value = prod.costo || 0;
-  document.getElementById('prod-stock').value = prod.stock || 0;
-
-  const btnSubmit = document.getElementById('btn-guardar-producto');
-  if (btnSubmit) btnSubmit.innerText = 'Actualizar Producto';
-}
-
-function eliminarProducto(index) {
-  if (confirm(`¿Estás seguro de eliminar el producto "${productos[index].nombre}"?`)) {
-    productos.splice(index, 1);
-    guardarLocalStorage();
-    actualizarTablaProductos();
+// Cálculo automático de Margen de Ganancia a Precio Venta
+function calcularPrecios() {
+  const costo = parseFloat(document.getElementById('prod-costo').value) || 0;
+  const ganancia = parseFloat(document.getElementById('prod-ganancia').value) || 0;
+  
+  if (costo > 0 && ganancia > 0) {
+    const precioCalculado = costo + (costo * (ganancia / 100));
+    document.getElementById('prod-precio').value = precioCalculado.toFixed(2);
   }
 }
 
 function limpiarFormularioProducto() {
-  productoSeleccionadoIndex = -1;
-  const form = document.getElementById('form-producto');
-  if (form) form.reset();
-
-  const btnSubmit = document.getElementById('btn-guardar-producto');
-  if (btnSubmit) btnSubmit.innerText = 'Guardar Producto';
+  document.getElementById('form-producto').reset();
 }
