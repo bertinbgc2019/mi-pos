@@ -20,22 +20,22 @@
       <button onclick="cambiarModulo('ventas')" id="btn-tab-ventas" class="tab-btn bg-white text-slate-900 font-bold px-4 py-2 rounded flex items-center gap-2 shadow">
         🛒 F1 Ventas
       </button>
-      <button onclick="cambiarModulo('creditos')" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
+      <button onclick="cambiarModulo('creditos')" id="btn-tab-creditos" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
         💲 F2 Créditos
       </button>
-      <button onclick="cambiarModulo('clientes')" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
+      <button onclick="cambiarModulo('clientes')" id="btn-tab-clientes" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
         👥 F3 Clientes
       </button>
       <button onclick="cambiarModulo('productos')" id="btn-tab-productos" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
         📦 F4 Productos
       </button>
-      <button onclick="cambiarModulo('inventario')" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
+      <button onclick="cambiarModulo('inventario')" id="btn-tab-inventario" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
         📋 F5 Inventario
       </button>
-      <button onclick="cambiarModulo('compras')" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
+      <button onclick="cambiarModulo('compras')" id="btn-tab-compras" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
         🚚 Compras
       </button>
-      <button onclick="cambiarModulo('reportes')" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
+      <button onclick="cambiarModulo('reportes')" id="btn-tab-reportes" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
         📊 Reportes
       </button>
     </nav>
@@ -75,12 +75,12 @@
         <div class="w-64 flex flex-col gap-2">
           <input type="text" placeholder="BUSCAR PRODUCTO:" class="w-full px-2 py-1 text-black rounded mb-2">
           <div class="grid grid-cols-3 gap-2">
-            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGENDEL PRODUCTO</div>
-            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGENDEL PRODUCTO</div>
-            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGENDEL PRODUCTO</div>
-            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGENDEL PRODUCTO</div>
-            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGENDEL PRODUCTO</div>
-            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGENDEL PRODUCTO</div>
+            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGEN DEL PRODUCTO</div>
+            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGEN DEL PRODUCTO</div>
+            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGEN DEL PRODUCTO</div>
+            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGEN DEL PRODUCTO</div>
+            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGEN DEL PRODUCTO</div>
+            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGEN DEL PRODUCTO</div>
           </div>
         </div>
 
@@ -101,7 +101,7 @@
                 </tr>
               </thead>
               <tbody id="carrito-body">
-                <!-- Se llena mediante JS -->
+                <!-- Se llena dinámicamente -->
               </tbody>
             </table>
           </div>
@@ -125,7 +125,7 @@
             F12 COBRAR
           </button>
           <div id="total-pagar" class="bg-white text-black font-black text-3xl px-8 py-2 rounded shadow text-center min-w-[180px]">
-            $ 0.00
+            $0.00
           </div>
         </div>
       </div>
@@ -239,6 +239,9 @@
     <div id="reloj-footer">09-Sep 05:06:00 pm</div>
   </footer>
 
-  <script src="js/app.js"></script>
+  <!-- Carga de scripts modularizada -->
+  <script src="js/main.js"></script>
+  <script src="js/modulos/ventas.js"></script>
+  <script src="js/modulos/productos.js"></script>
 </body>
 </html>
