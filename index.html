@@ -1,278 +1,102 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>G-Net Punto de Venta</title>
-  <link rel="manifest" href="manifest.json">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-  <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
-    .bg-gnet-dark { background-color: #1e2952; }
-    .bg-gnet-top { background-color: #162042; }
-    .bg-gnet-table-header { background-color: #abb2cb; }
-    .btn-top-nav { background-color: #ffffff; color: #1e2952; font-weight: 600; border-radius: 6px; }
-    .btn-top-nav:hover { background-color: #e2e8f0; }
-    .btn-top-nav.active { background-color: #3b82f6; color: #ffffff; }
-    .btn-action-gnet { background-color: #ffffff; color: #1e2952; border-radius: 6px; font-weight: 600; }
-    .btn-action-gnet:hover { background-color: #e2e8f0; }
-  </style>
-</head>
-<body class="bg-gnet-dark text-white h-screen flex flex-col justify-between overflow-hidden text-xs">
-
-  <!-- Encabezado Principal G-Net -->
-  <header class="bg-gnet-top px-4 py-2 flex justify-between items-center border-b border-blue-900">
-    <div class="flex items-center gap-6">
-      <!-- Logo G-Net -->
-      <div class="flex items-center gap-2">
-        <span class="text-3xl">🛒</span>
-        <div>
-          <h1 class="text-2xl font-black tracking-wider text-white leading-none">G-Net</h1>
-          <div class="w-full h-0.5 bg-blue-400 my-0.5"></div>
-        </div>
-      </div>
-
-      <!-- Menú Superior de Navegación -->
-      <nav class="flex items-center gap-2 overflow-x-auto">
-        <button id="nav-ventas" onclick="cambiarModulo('ventas')" class="btn-top-nav active px-3 py-1.5 flex items-center gap-1.5 shadow">
-          <span>🛒</span> F1 Ventas
-        </button>
-        <button id="nav-creditos" onclick="cambiarModulo('creditos')" class="btn-top-nav px-3 py-1.5 flex items-center gap-1.5 shadow">
-          <span>💲</span> F2 Créditos
-        </button>
-        <button id="nav-clientes" onclick="cambiarModulo('clientes')" class="btn-top-nav px-3 py-1.5 flex items-center gap-1.5 shadow">
-          <span>👥</span> F3 Clientes
-        </button>
-        <button id="nav-productos" onclick="cambiarModulo('productos')" class="btn-top-nav px-3 py-1.5 flex items-center gap-1.5 shadow">
-          <span>📦</span> F4 Productos
-        </button>
-        <button id="nav-inventario" onclick="cambiarModulo('inventario')" class="btn-top-nav px-3 py-1.5 flex items-center gap-1.5 shadow">
-          <span>📋</span> F5 Inventario
-        </button>
-        <button class="btn-top-nav px-3 py-1.5 flex items-center gap-1.5 shadow">
-          <span>🚚</span> Compras
-        </button>
-        <button class="btn-top-nav px-3 py-1.5 flex items-center gap-1.5 shadow">
-          <span>📊</span> Reportes
-        </button>
-      </nav>
+<!-- SECCIÓN PRODUCTOS -->
+<div id="modulo-productos" class="hidden flex-1 flex flex-col bg-[#1e295d] text-white">
+  
+  <!-- Subcabecera / Menú Lateral y Formulario -->
+  <div class="flex flex-1 p-4 gap-4">
+    
+    <!-- Menú Lateral Izquierdo -->
+    <div class="w-48 flex flex-col gap-2">
+      <button onclick="cambiarSubTabProducto('nuevo')" class="btn-subtab w-full py-2 px-3 border border-white rounded font-bold text-left hover:bg-slate-700 active-subtab">NUEVO</button>
+      <button onclick="cambiarSubTabProducto('modificar')" class="btn-subtab w-full py-2 px-3 border border-white rounded font-bold text-left hover:bg-slate-700">MODIFICAR</button>
+      <button onclick="cambiarSubTabProducto('eliminar')" class="btn-subtab w-full py-2 px-3 border border-white rounded font-bold text-left hover:bg-slate-700">ELIMINAR</button>
+      <button onclick="cambiarSubTabProducto('departamentos')" class="btn-subtab w-full py-2 px-3 border border-white rounded font-bold text-left hover:bg-slate-700">DEPARTAMENTOS</button>
+      <button onclick="cambiarSubTabProducto('ventas-periodo')" class="btn-subtab w-full py-2 px-3 border border-white rounded font-bold text-left hover:bg-slate-700">VENTAS POR PERIODO</button>
+      <button onclick="cambiarSubTabProducto('promociones')" class="btn-subtab w-full py-2 px-3 border border-white rounded font-bold text-left hover:bg-slate-700">PROMOCIONES</button>
+      <button onclick="cambiarSubTabProducto('importar')" class="btn-subtab w-full py-2 px-3 border border-white rounded font-bold text-left hover:bg-slate-700">IMPORTAR</button>
+      <button onclick="cambiarSubTabProducto('catalogo')" class="btn-subtab w-full py-2 px-3 border border-white rounded font-bold text-left hover:bg-slate-700">CATÁLOGO</button>
     </div>
 
-    <!-- Usuario Activo -->
-    <div class="flex items-center gap-2 font-bold text-sm">
-      <span>(BERTIN GARCIA CRUZ)</span>
-      <span class="text-2xl">👤</span>
-    </div>
-  </header>
-
-  <!-- Titulo de la Ventana Activa -->
-  <div class="bg-gnet-dark px-4 py-1 text-white font-bold text-sm tracking-wide border-b border-blue-900">
-    VENTA-TICKET 1
-  </div>
-
-  <!-- ==================== MÓDULO 1: VENTAS ==================== -->
-  <div id="modulo-ventas" class="flex-1 flex flex-col justify-between overflow-hidden p-2 gap-2">
-
-    <!-- Barra Superior de Búsqueda y Botones Rápidos -->
-    <div class="flex items-center justify-between gap-2">
-      <div class="flex items-center gap-2 flex-1">
-        <!-- Vista previa imagen -->
-        <div class="w-14 h-14 bg-white rounded flex items-center justify-center text-gray-400 font-bold text-[9px] text-center border p-1 text-black">
-          IMAGEN DEL PRODUCTO
-        </div>
-
-        <!-- Entrada del Código de Barras -->
-        <span class="font-bold text-sm text-white">PRODUCTO:</span>
-        <input type="text" id="barcode-input" placeholder="(CAMPO DE CODIGO PRODUCTO)" autofocus class="bg-white text-black font-semibold px-3 py-2 rounded w-80 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
-        
-        <button onclick="toggleCamara()" class="btn-action-gnet p-2 text-lg shadow" title="Escanear con Cámara">
-          📷
-        </button>
-      </div>
-
-      <!-- Botones Rápidos Superiores -->
-      <div class="flex items-center gap-1.5">
-        <button onclick="limpiarCarrito()" class="btn-action-gnet px-2.5 py-1.5 text-xs shadow">DEL Borrar carrito</button>
-        <button class="btn-action-gnet px-2.5 py-1.5 text-xs shadow flex items-center gap-1">🏷️ F11 Mayoreo</button>
-        <button class="btn-action-gnet px-2.5 py-1.5 text-xs shadow flex items-center gap-1">📥 F7 Entradas</button>
-        <button class="btn-action-gnet px-2.5 py-1.5 text-xs shadow flex items-center gap-1">📤 F8 Salidas</button>
-        <button class="btn-action-gnet px-2.5 py-1.5 text-xs shadow flex items-center gap-1">🔍 F9 Verificador</button>
-      </div>
-    </div>
-
-    <!-- Área Central (Paneles Izquierdo y Derecho) -->
-    <div class="flex-1 flex gap-2 overflow-hidden">
+    <!-- Panel Principal Variable según Subtab -->
+    <div class="flex-1 flex gap-6 items-start bg-[#1e295d] p-4 rounded">
       
-      <!-- Panel Izquierdo: Catálogo Visual / Búsqueda Rápida -->
-      <div class="w-72 bg-slate-200 text-black p-2 rounded flex flex-col gap-2 overflow-hidden">
-        <div class="flex items-center gap-1">
-          <span class="font-bold text-[10px] uppercase">BUSCAR PRODUCTO:</span>
-          <input type="text" class="border border-gray-400 rounded px-1.5 py-0.5 text-xs flex-1">
+      <!-- FORMULARIO NUEVO / MODIFICAR -->
+      <form id="form-producto" onsubmit="guardarProducto(event)" class="flex-1 flex flex-col gap-2 text-sm max-w-xl">
+        <div class="flex items-center gap-2">
+          <label class="w-36 font-bold text-right">Código de Barras:</label>
+          <input type="text" id="prod-codigo" required class="flex-1 px-2 py-1 text-black rounded border">
+          <button type="button" class="bg-gray-200 p-1.5 rounded text-black">📷</button>
         </div>
 
-        <!-- Cuadrícula de Accesos Directos a Productos -->
-        <div class="flex-1 grid grid-cols-3 gap-1.5 overflow-y-auto">
-          <div class="bg-white border-2 border-slate-400 rounded p-1 flex items-center justify-center text-center text-[9px] font-bold cursor-pointer hover:bg-blue-50">IMAGEN DEL PRODUCTO</div>
-          <div class="bg-white border-2 border-slate-400 rounded p-1 flex items-center justify-center text-center text-[9px] font-bold cursor-pointer hover:bg-blue-50">IMAGEN DEL PRODUCTO</div>
-          <div class="bg-white border-2 border-slate-400 rounded p-1 flex items-center justify-center text-center text-[9px] font-bold cursor-pointer hover:bg-blue-50">IMAGEN DEL PRODUCTO</div>
-          <div class="bg-white border-2 border-slate-400 rounded p-1 flex items-center justify-center text-center text-[9px] font-bold cursor-pointer hover:bg-blue-50">IMAGEN DEL PRODUCTO</div>
-          <div class="bg-white border-2 border-slate-400 rounded p-1 flex items-center justify-center text-center text-[9px] font-bold cursor-pointer hover:bg-blue-50">IMAGEN DEL PRODUCTO</div>
-          <div class="bg-white border-2 border-slate-400 rounded p-1 flex items-center justify-center text-center text-[9px] font-bold cursor-pointer hover:bg-blue-50">IMAGEN DEL PRODUCTO</div>
-          <div class="bg-white border-2 border-slate-400 rounded p-1 flex items-center justify-center text-center text-[9px] font-bold cursor-pointer hover:bg-blue-50">IMAGEN DEL PRODUCTO</div>
-          <div class="bg-white border-2 border-slate-400 rounded p-1 flex items-center justify-center text-center text-[9px] font-bold cursor-pointer hover:bg-blue-50">IMAGEN DEL PRODUCTO</div>
-          <div class="bg-white border-2 border-slate-400 rounded p-1 flex items-center justify-center text-center text-[9px] font-bold cursor-pointer hover:bg-blue-50">IMAGEN DEL PRODUCTO</div>
-        </div>
-      </div>
-
-      <!-- Panel Derecho: Tabla del Carrito -->
-      <div class="flex-1 bg-white text-black rounded flex flex-col overflow-hidden">
-        <div class="bg-slate-300 px-3 py-1 text-slate-700 font-bold text-xs border-b">
-          TICKET 1
-        </div>
-        
-        <div class="flex-1 overflow-y-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-gnet-table-header text-slate-800 font-bold text-xs">
-                <th class="p-2 border-r border-slate-400">CÓDIGO DE BARRAS</th>
-                <th class="p-2 border-r border-slate-400">DESCRIPCIÓN DEL PRODUCTO</th>
-                <th class="p-2 border-r border-slate-400 text-right">PRECIO</th>
-                <th class="p-2 border-r border-slate-400 text-center">CANTIDAD</th>
-                <th class="p-2 border-r border-slate-400 text-right">IMPORTE</th>
-                <th class="p-2 text-center">EXISTENCIA</th>
-              </tr>
-            </thead>
-            <tbody id="carrito-body" class="divide-y divide-gray-200 text-xs font-semibold">
-              <!-- Elementos del carrito cargados por JS -->
-            </tbody>
-          </table>
+        <div class="flex items-center gap-2">
+          <label class="w-36 font-bold text-right">Descripción:</label>
+          <input type="text" id="prod-nombre" required class="flex-1 px-2 py-1 text-black rounded border">
         </div>
 
-        <div class="bg-slate-300 px-3 py-1 text-slate-700 font-bold text-xs border-t">
-          0 Productos en la Venta actual
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Panel Inferior: Acciones secundarias y Total -->
-    <div class="flex justify-between items-center gap-2">
-      <!-- Botones Inferiores -->
-      <div class="flex items-center gap-1.5">
-        <button class="btn-action-gnet px-3 py-2 text-xs flex items-center gap-1">🔄 F5 CAMBIAR</button>
-        <button class="btn-action-gnet px-3 py-2 text-xs">F6 PENDIENTE</button>
-        <button onclick="limpiarCarrito()" class="btn-action-gnet px-3 py-2 text-xs">ELIMINAR</button>
-        <button class="btn-action-gnet px-3 py-2 text-xs">ASIGNAR CLIENTE</button>
-        <button class="btn-action-gnet px-3 py-2 text-xs">Ventas del día</button>
-        <button class="btn-action-gnet px-3 py-2 text-xs">Reimp. Ticket</button>
-      </div>
-
-      <!-- Botón Cobrar y Gran Total -->
-      <div class="flex items-center gap-2">
-        <button onclick="procesarCobro()" class="bg-white text-slate-900 font-black text-lg px-8 py-3 rounded shadow hover:bg-slate-100 uppercase tracking-wide">
-          F12 COBRAR
-        </button>
-        
-        <div class="bg-white text-black px-6 py-1.5 rounded text-right shadow min-w-[200px]">
-          <span id="total-pagar" class="text-4xl font-black font-mono">$ 0.00</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ==================== MÓDULO 2: PRODUCTOS ==================== -->
-  <div id="modulo-productos" class="flex-1 flex flex-col justify-between overflow-hidden p-4 hidden">
-    <div class="bg-white text-black rounded p-4 flex-1 flex gap-6 overflow-hidden">
-      <!-- Formulario -->
-      <form id="form-producto" onsubmit="guardarProducto(event)" class="w-1/2 space-y-3 border-r pr-4 border-gray-200">
-        <h3 class="font-bold text-blue-900 text-sm border-b pb-1">Alta / Edición de Producto</h3>
-        
-        <div>
-          <label class="block font-semibold">Código de Barras:</label>
-          <input type="text" id="prod-codigo" required class="border border-gray-400 p-1 rounded w-full font-mono text-black">
+        <div class="flex items-center gap-2 pl-36">
+          <label class="flex items-center gap-1"><input type="radio" name="tipo_venta" value="unidad" checked> Por Unidad/Pza</label>
+          <label class="flex items-center gap-1 ml-4"><input type="radio" name="tipo_venta" value="granel"> A Granel</label>
         </div>
 
-        <div>
-          <label class="block font-semibold">Nombre / Descripción:</label>
-          <input type="text" id="prod-nombre" required class="border border-gray-400 p-1 rounded w-full text-black">
+        <div class="flex items-center gap-2">
+          <label class="w-36 font-bold text-right">Precio Costo:</label>
+          <input type="number" step="0.01" id="prod-costo" value="0.00" oninput="calcularPrecios()" class="w-32 px-2 py-1 text-black text-right rounded border">
         </div>
 
-        <div class="grid grid-cols-3 gap-2">
-          <div>
-            <label class="block font-semibold">Costo:</label>
-            <input type="number" step="0.01" id="prod-costo" class="border border-gray-400 p-1 rounded w-full font-mono text-black">
+        <div class="flex items-center gap-2">
+          <label class="w-36 font-bold text-right">Ganancia:</label>
+          <input type="number" step="0.1" id="prod-ganancia" value="0.0" oninput="calcularPrecios()" class="w-32 px-2 py-1 text-black text-right rounded border">%
+        </div>
+
+        <div class="flex items-center gap-2">
+          <label class="w-36 font-bold text-right">Precio Venta:</label>
+          <input type="number" step="0.01" id="prod-precio" value="0.00" class="w-32 px-2 py-1 text-black text-right rounded border">
+        </div>
+
+        <div class="flex items-center gap-2">
+          <label class="w-36 font-bold text-right">Precio Mayoreo:</label>
+          <input type="number" step="0.01" id="prod-mayoreo" value="0.00" class="w-32 px-2 py-1 text-black text-right rounded border">
+        </div>
+
+        <div class="flex items-center gap-2">
+          <label class="w-36 font-bold text-right">Departamento:</label>
+          <select id="prod-depto" class="flex-1 px-2 py-1 text-black rounded border">
+            <option value="">Seleccionar Departamento</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2 mt-2">
+          <label class="w-36 font-bold text-right">Utiliza Inventario:</label>
+          <input type="checkbox" id="prod-usa-inv" checked onchange="toggleInventarioCampos(this.checked)">
+        </div>
+
+        <div id="campos-inventario" class="flex flex-col gap-2">
+          <div class="flex items-center gap-2">
+            <label class="w-36 font-bold text-right">Hay:</label>
+            <input type="number" id="prod-stock" value="0" class="w-24 px-2 py-1 text-black text-right rounded border">
           </div>
-          <div>
-            <label class="block font-semibold">Precio Venta:</label>
-            <input type="number" step="0.01" id="prod-precio" required class="border border-gray-400 p-1 rounded w-full font-mono font-bold text-blue-900">
+          <div class="flex items-center gap-2">
+            <label class="w-36 font-bold text-right">Mínimo:</label>
+            <input type="number" id="prod-min" value="0" class="w-24 px-2 py-1 text-black text-right rounded border">
           </div>
-          <div>
-            <label class="block font-semibold">Stock Inicial:</label>
-            <input type="number" id="prod-stock" value="10" class="border border-gray-400 p-1 rounded w-full font-mono text-black">
+          <div class="flex items-center gap-2">
+            <label class="w-36 font-bold text-right">Máximo:</label>
+            <input type="number" id="prod-max" value="0" class="w-24 px-2 py-1 text-black text-right rounded border">
           </div>
         </div>
 
-        <div class="flex gap-2 pt-2">
-          <button type="submit" id="btn-guardar-producto" class="bg-blue-900 text-white font-bold px-4 py-1.5 rounded hover:bg-blue-800">
-            Guardar Producto
-          </button>
-          <button type="button" onclick="limpiarFormularioProducto()" class="bg-gray-300 text-gray-800 font-bold px-4 py-1.5 rounded hover:bg-gray-400">
-            Limpiar
-          </button>
+        <!-- Botones Guardar / Cancelar -->
+        <div class="flex gap-4 justify-center mt-6">
+          <button type="submit" class="bg-white text-black font-bold px-6 py-2 rounded shadow hover:bg-gray-100">GUARDAR</button>
+          <button type="button" onclick="limpiarFormularioProducto()" class="bg-white text-red-600 font-bold px-6 py-2 rounded shadow hover:bg-gray-100">CANCELAR</button>
         </div>
       </form>
 
-      <!-- Tabla de Catálogo -->
-      <div class="w-1/2 overflow-y-auto">
-        <h3 class="font-bold text-gray-700 text-sm border-b pb-1 mb-2">Catálogo Registrado</h3>
-        <table class="w-full text-left border-collapse border border-gray-300">
-          <thead>
-            <tr class="bg-gray-100 text-xs border-b border-gray-300">
-              <th class="p-1.5 border-r">Código</th>
-              <th class="p-1.5 border-r">Producto</th>
-              <th class="p-1.5 border-r text-right">Precio</th>
-              <th class="p-1.5 border-r text-right">Stock</th>
-              <th class="p-1.5 text-center">Acción</th>
-            </tr>
-          </thead>
-          <tbody id="productos-body" class="divide-y divide-gray-200 text-xs">
-            <!-- Productos -->
-          </tbody>
-        </table>
+      <!-- Cuadro de Carga de Imagen -->
+      <div class="w-64 flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-400 rounded bg-[#161f48]">
+        <div class="text-6xl text-gray-400 mb-2">🖼️</div>
+        <button type="button" class="text-sm font-semibold hover:underline">Cargar Imagen de Producto...</button>
       </div>
+
     </div>
   </div>
-
-  <!-- Barra de Estado Inferior -->
-  <footer class="bg-slate-300 text-slate-800 px-3 py-1 text-[11px] font-semibold flex justify-between items-center border-t border-slate-400">
-    <div>G-Net Punto de Venta... Teclee o escanee el Código de Producto</div>
-    <div class="flex gap-4 font-mono">
-      <span>09-Sep</span>
-      <span id="live-clock">03:30:31 pm</span>
-    </div>
-  </footer>
-
-  <!-- Modal Cámara -->
-  <div id="reader-container" class="fixed inset-0 bg-black bg-opacity-75 z-50 flex flex-col items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-4 flex flex-col items-center text-black">
-      <div class="w-full flex justify-between items-center mb-2 border-b pb-2">
-        <h3 class="font-bold text-gray-800 text-sm">📷 Escanear Código</h3>
-        <button onclick="toggleCamara()" class="text-red-600 font-bold text-base px-2">✕</button>
-      </div>
-      <div id="reader" class="w-full bg-black rounded overflow-hidden"></div>
-      <button onclick="toggleCamara()" class="mt-3 bg-gray-200 text-gray-800 px-4 py-1.5 rounded font-bold text-xs w-full">
-        Cerrar Cámara
-      </button>
-    </div>
-  </div>
-
-  <!-- Scripts Modulares -->
-  <script src="js/config.js"></script>
-  <script src="js/router.js"></script>
-  <script src="js/escaner.js"></script>
-  <script src="js/modulos/ventas.js"></script>
-  <script src="js/modulos/productos.js"></script>
-</body>
-</html>
+</div>
