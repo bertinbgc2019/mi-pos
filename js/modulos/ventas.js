@@ -1,129 +1,43 @@
-// js/modulos/ventas.js - Lógica del Carrito, Lectura de Barras y Cobro
-
-document.addEventListener('DOMContentLoaded', () => {
-  configurarLectorModoTexto();
-});
-
-function configurarLectorModoTexto() {
-  const input = document.getElementById('barcode-input');
-  if (!input) return;
-
-  // Detectar cuándo el lector presiona Enter automáticamente al terminar de leer
-  input.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const codigo = input.value.trim();
-      if (codigo) {
-        buscarProductoPorCodigo(codigo);
-      }
-    }
-  });
-}
-
-function buscarProductoPorCodigo(codigo) {
-  if (!codigo) return;
-  
-  const prod = productos.find(p => p.codigo === codigo);
-  if (prod) {
-    agregarAlCarrito(prod);
-    const input = document.getElementById('barcode-input');
-    if (input) input.value = '';
-  } else {
-    alert(`Producto no encontrado para el código: ${codigo}`);
-    const input = document.getElementById('barcode-input');
-    if (input) input.select();
-  }
-}
-
-function agregarAlCarrito(producto) {
-  const itemExistente = carrito.find(item => item.id === producto.id);
-  
-  if (itemExistente) {
-    itemExistente.cantidad += 1;
-  } else {
-    carrito.push({
-      id: producto.id,
-      codigo: producto.codigo,
-      nombre: producto.nombre,
-      precio: producto.precio,
-      cantidad: 1
-    });
-  }
-  
-  actualizarTablaCarrito();
-}
-
 function actualizarTablaCarrito() {
   const tbody = document.getElementById('carrito-body');
   const totalEl = document.getElementById('total-pagar');
+  const contadorEl = document.querySelector('.bg-slate-300.px-3.py-1'); // Contador inferior
   if (!tbody) return;
 
   tbody.innerHTML = '';
   let total = 0;
+  let totalArticulos = 0;
 
   carrito.forEach((item, index) => {
     const subtotal = item.precio * item.cantidad;
     total += subtotal;
+    totalArticulos += item.cantidad;
+
+    // Buscar existencia en el catálogo si está disponible
+    const prodCatalogo = productos.find(p => p.id === item.id || p.codigo === item.codigo);
+    const existencia = prodCatalogo ? prodCatalogo.stock : '--';
 
     const tr = document.createElement('tr');
-    tr.className = "hover:bg-gray-50 border-b border-gray-200";
+    tr.className = "hover:bg-slate-100 border-b border-gray-200 text-black";
     tr.innerHTML = `
-      <td class="p-1.5 font-medium text-gray-800">${item.nombre}</td>
-      <td class="p-1.5 text-center">
-        <input type="number" value="${item.cantidad}" min="1" class="w-16 border rounded p-1 text-center font-mono font-bold" onchange="cambiarCantidadCarrito(${index}, this.value)">
+      <td class="p-2 font-mono text-gray-700">${item.codigo || '--'}</td>
+      <td class="p-2 font-semibold text-gray-900">${item.nombre}</td>
+      <td class="p-2 text-right font-mono font-bold">$${item.precio.toFixed(2)}</td>
+      <td class="p-2 text-center">
+        <input type="number" value="${item.cantidad}" min="1" class="w-14 border border-gray-400 rounded p-0.5 text-center font-mono font-bold" onchange="cambiarCantidadCarrito(${index}, this.value)">
       </td>
-      <td class="p-1.5 text-right font-mono">$${item.precio.toFixed(2)}</td>
-      <td class="p-1.5 text-right font-mono font-bold text-blue-900 bg-[#f4f9f4]">$${subtotal.toFixed(2)}</td>
-      <td class="p-1.5 text-center">
-        <button onclick="eliminarDelCarrito(${index})" class="text-red-600 hover:text-red-800 font-bold px-2 py-0.5 rounded border border-red-200 hover:bg-red-50">✕</button>
-      </td>
+      <td class="p-2 text-right font-mono font-bold text-blue-900">$${subtotal.toFixed(2)}</td>
+      <td class="p-2 text-center font-mono text-gray-600">${existencia}</td>
     `;
     tbody.appendChild(tr);
   });
 
-  if (totalEl) totalEl.innerText = `$${total.toFixed(2)}`;
-}
+  // Actualizar Gran Total
+  if (totalEl) totalEl.innerText = `$ ${total.toFixed(2)}`;
 
-function cambiarCantidadCarrito(index, nuevaCantidad) {
-  const cant = parseInt(nuevaCantidad);
-  if (cant > 0) {
-    carrito[index].cantidad = cant;
-  } else {
-    carrito.splice(index, 1);
+  // Actualizar contador de productos al pie de la tabla
+  const contadorTabla = document.querySelector('#modulo-ventas .bg-slate-300.text-slate-700');
+  if (contadorTabla) {
+    contadorTabla.innerText = `${totalArticulos} Productos en la Venta actual`;
   }
-  actualizarTablaCarrito();
-}
-
-function eliminarDelCarrito(index) {
-  carrito.splice(index, 1);
-  actualizarTablaCarrito();
-}
-
-function limpiarCarrito() {
-  carrito = [];
-  actualizarTablaCarrito();
-  const input = document.getElementById('barcode-input');
-  if (input) input.focus();
-}
-
-function procesarCobro() {
-  if (carrito.length === 0) {
-    alert('El carrito está vacío.');
-    return;
-  }
-
-  const total = carrito.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
-  
-  const nuevaVenta = {
-    id: Date.now(),
-    fecha: new Date().toISOString(),
-    items: [...carrito],
-    total: total
-  };
-
-  ventas.push(nuevaVenta);
-  guardarLocalStorage();
-  
-  alert(`¡Venta realizada con éxito por $${total.toFixed(2)}!`);
-  limpiarCarrito();
 }
