@@ -1,102 +1,244 @@
-<!-- SECCIÓN PRODUCTOS -->
-<div id="modulo-productos" class="hidden flex-1 flex flex-col bg-[#1e295d] text-white">
-  
-  <!-- Subcabecera / Menú Lateral y Formulario -->
-  <div class="flex flex-1 p-4 gap-4">
-    
-    <!-- Menú Lateral Izquierdo -->
-    <div class="w-48 flex flex-col gap-2">
-      <button onclick="cambiarSubTabProducto('nuevo')" class="btn-subtab w-full py-2 px-3 border border-white rounded font-bold text-left hover:bg-slate-700 active-subtab">NUEVO</button>
-      <button onclick="cambiarSubTabProducto('modificar')" class="btn-subtab w-full py-2 px-3 border border-white rounded font-bold text-left hover:bg-slate-700">MODIFICAR</button>
-      <button onclick="cambiarSubTabProducto('eliminar')" class="btn-subtab w-full py-2 px-3 border border-white rounded font-bold text-left hover:bg-slate-700">ELIMINAR</button>
-      <button onclick="cambiarSubTabProducto('departamentos')" class="btn-subtab w-full py-2 px-3 border border-white rounded font-bold text-left hover:bg-slate-700">DEPARTAMENTOS</button>
-      <button onclick="cambiarSubTabProducto('ventas-periodo')" class="btn-subtab w-full py-2 px-3 border border-white rounded font-bold text-left hover:bg-slate-700">VENTAS POR PERIODO</button>
-      <button onclick="cambiarSubTabProducto('promociones')" class="btn-subtab w-full py-2 px-3 border border-white rounded font-bold text-left hover:bg-slate-700">PROMOCIONES</button>
-      <button onclick="cambiarSubTabProducto('importar')" class="btn-subtab w-full py-2 px-3 border border-white rounded font-bold text-left hover:bg-slate-700">IMPORTAR</button>
-      <button onclick="cambiarSubTabProducto('catalogo')" class="btn-subtab w-full py-2 px-3 border border-white rounded font-bold text-left hover:bg-slate-700">CATÁLOGO</button>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>G-Net Punto de Venta</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#1e295d] text-white min-h-screen flex flex-col font-sans select-none">
+
+  <!-- CABECERA PRINCIPAL -->
+  <header class="bg-[#1e295d] px-6 py-3 border-b border-blue-900 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <div class="text-3xl">🛒</div>
+      <h1 class="text-2xl font-bold tracking-wide">G-Net</h1>
     </div>
 
-    <!-- Panel Principal Variable según Subtab -->
-    <div class="flex-1 flex gap-6 items-start bg-[#1e295d] p-4 rounded">
+    <!-- MENÚ NAVEGACIÓN SUPERIOR -->
+    <nav class="flex gap-2">
+      <button onclick="cambiarModulo('ventas')" id="btn-tab-ventas" class="tab-btn bg-white text-slate-900 font-bold px-4 py-2 rounded flex items-center gap-2 shadow">
+        🛒 F1 Ventas
+      </button>
+      <button onclick="cambiarModulo('creditos')" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
+        💲 F2 Créditos
+      </button>
+      <button onclick="cambiarModulo('clientes')" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
+        👥 F3 Clientes
+      </button>
+      <button onclick="cambiarModulo('productos')" id="btn-tab-productos" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
+        📦 F4 Productos
+      </button>
+      <button onclick="cambiarModulo('inventario')" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
+        📋 F5 Inventario
+      </button>
+      <button onclick="cambiarModulo('compras')" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
+        🚚 Compras
+      </button>
+      <button onclick="cambiarModulo('reportes')" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
+        📊 Reportes
+      </button>
+    </nav>
+
+    <div class="flex items-center gap-2 font-bold text-sm">
+      <span>(BERTIN GARCIA CRUZ)</span>
+      <div class="w-8 h-8 rounded-full bg-slate-400 flex items-center justify-center">👤</div>
+    </div>
+  </header>
+
+  <!-- ÁREA DE MÓDULOS -->
+  <main class="flex-1 flex flex-col relative">
+
+    <!-- ========================================== -->
+    <!-- MÓDULO 1: VENTAS (ACTIVO POR DEFECTO) -->
+    <!-- ========================================== -->
+    <section id="modulo-ventas" class="flex-1 flex flex-col p-4 gap-4">
       
-      <!-- FORMULARIO NUEVO / MODIFICAR -->
-      <form id="form-producto" onsubmit="guardarProducto(event)" class="flex-1 flex flex-col gap-2 text-sm max-w-xl">
-        <div class="flex items-center gap-2">
-          <label class="w-36 font-bold text-right">Código de Barras:</label>
-          <input type="text" id="prod-codigo" required class="flex-1 px-2 py-1 text-black rounded border">
-          <button type="button" class="bg-gray-200 p-1.5 rounded text-black">📷</button>
-        </div>
+      <!-- Barra superior de búsqueda -->
+      <div class="flex items-center gap-3">
+        <span class="font-bold text-lg">PRODUCTO:</span>
+        <input type="text" id="input-buscar-codigo" placeholder="(CAMPO DE CODIGO PRODUCTO)" onkeydown="evaluarBusquedaVentas(event)" class="flex-1 max-w-md px-3 py-2 text-black font-semibold rounded outline-none border">
+        <button class="bg-gray-200 p-2 rounded text-black hover:bg-gray-300">📷</button>
 
-        <div class="flex items-center gap-2">
-          <label class="w-36 font-bold text-right">Descripción:</label>
-          <input type="text" id="prod-nombre" required class="flex-1 px-2 py-1 text-black rounded border">
+        <div class="ml-auto flex gap-2">
+          <button onclick="vaciarCarrito()" class="bg-white text-slate-900 font-bold px-3 py-1.5 rounded hover:bg-gray-100">DEL Borrar carrito</button>
+          <button class="bg-white text-slate-900 font-bold px-3 py-1.5 rounded hover:bg-gray-100">🏷️ F11 Mayoreo</button>
+          <button class="bg-white text-slate-900 font-bold px-3 py-1.5 rounded hover:bg-gray-100">📥 F7 Entradas</button>
+          <button class="bg-white text-slate-900 font-bold px-3 py-1.5 rounded hover:bg-gray-100">📤 F8 Salidas</button>
+          <button class="bg-white text-slate-900 font-bold px-3 py-1.5 rounded hover:bg-gray-100">🔍 F9 Verificador</button>
         </div>
-
-        <div class="flex items-center gap-2 pl-36">
-          <label class="flex items-center gap-1"><input type="radio" name="tipo_venta" value="unidad" checked> Por Unidad/Pza</label>
-          <label class="flex items-center gap-1 ml-4"><input type="radio" name="tipo_venta" value="granel"> A Granel</label>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <label class="w-36 font-bold text-right">Precio Costo:</label>
-          <input type="number" step="0.01" id="prod-costo" value="0.00" oninput="calcularPrecios()" class="w-32 px-2 py-1 text-black text-right rounded border">
-        </div>
-
-        <div class="flex items-center gap-2">
-          <label class="w-36 font-bold text-right">Ganancia:</label>
-          <input type="number" step="0.1" id="prod-ganancia" value="0.0" oninput="calcularPrecios()" class="w-32 px-2 py-1 text-black text-right rounded border">%
-        </div>
-
-        <div class="flex items-center gap-2">
-          <label class="w-36 font-bold text-right">Precio Venta:</label>
-          <input type="number" step="0.01" id="prod-precio" value="0.00" class="w-32 px-2 py-1 text-black text-right rounded border">
-        </div>
-
-        <div class="flex items-center gap-2">
-          <label class="w-36 font-bold text-right">Precio Mayoreo:</label>
-          <input type="number" step="0.01" id="prod-mayoreo" value="0.00" class="w-32 px-2 py-1 text-black text-right rounded border">
-        </div>
-
-        <div class="flex items-center gap-2">
-          <label class="w-36 font-bold text-right">Departamento:</label>
-          <select id="prod-depto" class="flex-1 px-2 py-1 text-black rounded border">
-            <option value="">Seleccionar Departamento</option>
-          </select>
-        </div>
-
-        <div class="flex items-center gap-2 mt-2">
-          <label class="w-36 font-bold text-right">Utiliza Inventario:</label>
-          <input type="checkbox" id="prod-usa-inv" checked onchange="toggleInventarioCampos(this.checked)">
-        </div>
-
-        <div id="campos-inventario" class="flex flex-col gap-2">
-          <div class="flex items-center gap-2">
-            <label class="w-36 font-bold text-right">Hay:</label>
-            <input type="number" id="prod-stock" value="0" class="w-24 px-2 py-1 text-black text-right rounded border">
-          </div>
-          <div class="flex items-center gap-2">
-            <label class="w-36 font-bold text-right">Mínimo:</label>
-            <input type="number" id="prod-min" value="0" class="w-24 px-2 py-1 text-black text-right rounded border">
-          </div>
-          <div class="flex items-center gap-2">
-            <label class="w-36 font-bold text-right">Máximo:</label>
-            <input type="number" id="prod-max" value="0" class="w-24 px-2 py-1 text-black text-right rounded border">
-          </div>
-        </div>
-
-        <!-- Botones Guardar / Cancelar -->
-        <div class="flex gap-4 justify-center mt-6">
-          <button type="submit" class="bg-white text-black font-bold px-6 py-2 rounded shadow hover:bg-gray-100">GUARDAR</button>
-          <button type="button" onclick="limpiarFormularioProducto()" class="bg-white text-red-600 font-bold px-6 py-2 rounded shadow hover:bg-gray-100">CANCELAR</button>
-        </div>
-      </form>
-
-      <!-- Cuadro de Carga de Imagen -->
-      <div class="w-64 flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-400 rounded bg-[#161f48]">
-        <div class="text-6xl text-gray-400 mb-2">🖼️</div>
-        <button type="button" class="text-sm font-semibold hover:underline">Cargar Imagen de Producto...</button>
       </div>
 
-    </div>
-  </div>
-</div>
+      <!-- Cuerpo principal de Ventas -->
+      <div class="flex-1 flex gap-4">
+        <!-- Panel lateral rápido -->
+        <div class="w-64 flex flex-col gap-2">
+          <input type="text" placeholder="BUSCAR PRODUCTO:" class="w-full px-2 py-1 text-black rounded mb-2">
+          <div class="grid grid-cols-3 gap-2">
+            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGENDEL PRODUCTO</div>
+            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGENDEL PRODUCTO</div>
+            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGENDEL PRODUCTO</div>
+            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGENDEL PRODUCTO</div>
+            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGENDEL PRODUCTO</div>
+            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGENDEL PRODUCTO</div>
+          </div>
+        </div>
+
+        <!-- Tabla de Carrito -->
+        <div class="flex-1 flex flex-col bg-slate-200 rounded text-black overflow-hidden border">
+          <div class="bg-slate-300 font-bold p-2 text-slate-800 border-b">TICKET 1</div>
+          <div class="flex-1 overflow-y-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-300 text-slate-700 text-xs uppercase border-b">
+                  <th class="p-2">CÓDIGO DE BARRAS</th>
+                  <th class="p-2">DESCRIPCIÓN DEL PRODUCTO</th>
+                  <th class="p-2 text-right">PRECIO</th>
+                  <th class="p-2 text-center">CANTIDAD</th>
+                  <th class="p-2 text-right">IMPORTE</th>
+                  <th class="p-2 text-center">EXISTENCIA</th>
+                  <th class="p-2 text-center"></th>
+                </tr>
+              </thead>
+              <tbody id="carrito-body">
+                <!-- Se llena mediante JS -->
+              </tbody>
+            </table>
+          </div>
+          <div id="contador-productos-carrito" class="bg-slate-300 p-2 font-bold text-slate-700 text-sm border-t">
+            0 Productos en la Venta actual
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra inferior de acciones y cobro -->
+      <div class="flex items-center gap-2 pt-2">
+        <button class="bg-white text-slate-900 font-bold px-3 py-2 rounded">💵 F5 CAMBIAR</button>
+        <button class="bg-white text-slate-900 font-bold px-3 py-2 rounded">F6 PENDIENTE</button>
+        <button class="bg-white text-slate-900 font-bold px-3 py-2 rounded">ELIMINAR</button>
+        <button class="bg-white text-slate-900 font-bold px-3 py-2 rounded">ASIGNAR CLIENTE</button>
+        <button class="bg-white text-slate-900 font-bold px-3 py-2 rounded">Ventas del día</button>
+        <button class="bg-white text-slate-900 font-bold px-3 py-2 rounded">Reimp. Ticket</button>
+
+        <div class="ml-auto flex items-center gap-4">
+          <button class="bg-white text-black font-black text-xl px-8 py-3 rounded shadow hover:bg-gray-100">
+            F12 COBRAR
+          </button>
+          <div id="total-pagar" class="bg-white text-black font-black text-3xl px-8 py-2 rounded shadow text-center min-w-[180px]">
+            $ 0.00
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- MÓDULO 2: PRODUCTOS (OCULTO DE INICIO) -->
+    <!-- ========================================== -->
+    <section id="modulo-productos" class="hidden flex-1 flex flex-col p-4">
+      
+      <div class="flex flex-1 gap-6">
+        <!-- Menú Lateral -->
+        <div class="w-48 flex flex-col gap-2">
+          <button onclick="cambiarSubTabProducto('nuevo')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded bg-slate-700">NUEVO</button>
+          <button onclick="cambiarSubTabProducto('modificar')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">MODIFICAR</button>
+          <button onclick="cambiarSubTabProducto('eliminar')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">ELIMINAR</button>
+          <button onclick="cambiarSubTabProducto('departamentos')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">DEPARTAMENTOS</button>
+          <button onclick="cambiarSubTabProducto('ventas-periodo')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">VENTAS POR PERIODO</button>
+          <button onclick="cambiarSubTabProducto('promociones')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">PROMOCIONES</button>
+          <button onclick="cambiarSubTabProducto('importar')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">IMPORTAR</button>
+          <button onclick="cambiarSubTabProducto('catalogo')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">CATÁLOGO</button>
+        </div>
+
+        <!-- Vista Formulario de Registro -->
+        <div id="subvista-producto-formulario" class="flex-1 flex gap-8 items-start">
+          <form id="form-producto" onsubmit="guardarProducto(event)" class="flex-1 flex flex-col gap-2 text-sm max-w-xl">
+            <div class="flex items-center gap-2">
+              <label class="w-36 font-bold text-right">Código de Barras:</label>
+              <input type="text" id="prod-codigo" required class="flex-1 px-2 py-1 text-black rounded border">
+              <button type="button" class="bg-gray-200 p-1 rounded text-black">📷</button>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <label class="w-36 font-bold text-right">Descripción:</label>
+              <input type="text" id="prod-nombre" required class="flex-1 px-2 py-1 text-black rounded border">
+            </div>
+
+            <div class="flex items-center gap-2 pl-36">
+              <label class="flex items-center gap-1"><input type="radio" name="tipo_venta" value="unidad" checked> Por Unidad/Pza</label>
+              <label class="flex items-center gap-1 ml-4"><input type="radio" name="tipo_venta" value="granel"> A Granel</label>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <label class="w-36 font-bold text-right">Precio Costo:</label>
+              <input type="number" step="0.01" id="prod-costo" value="0.00" oninput="calcularPrecios()" class="w-32 px-2 py-1 text-black text-right rounded border">
+            </div>
+
+            <div class="flex items-center gap-2">
+              <label class="w-36 font-bold text-right">Ganancia:</label>
+              <input type="number" step="0.1" id="prod-ganancia" value="0.0" oninput="calcularPrecios()" class="w-32 px-2 py-1 text-black text-right rounded border">%
+            </div>
+
+            <div class="flex items-center gap-2">
+              <label class="w-36 font-bold text-right">Precio Venta:</label>
+              <input type="number" step="0.01" id="prod-precio" value="0.00" class="w-32 px-2 py-1 text-black text-right rounded border">
+            </div>
+
+            <div class="flex items-center gap-2">
+              <label class="w-36 font-bold text-right">Precio Mayoreo:</label>
+              <input type="number" step="0.01" id="prod-mayoreo" value="0.00" class="w-32 px-2 py-1 text-black text-right rounded border">
+            </div>
+
+            <div class="flex items-center gap-2">
+              <label class="w-36 font-bold text-right">Departamento:</label>
+              <select id="prod-depto" class="flex-1 px-2 py-1 text-black rounded border">
+                <option value="">Seleccionar Departamento</option>
+              </select>
+            </div>
+
+            <div class="flex items-center gap-2 mt-1">
+              <label class="w-36 font-bold text-right">Utiliza Inventario:</label>
+              <input type="checkbox" id="prod-usa-inv" checked>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <div class="flex items-center gap-2">
+                <label class="w-36 font-bold text-right">Hay:</label>
+                <input type="number" id="prod-stock" value="0" class="w-24 px-2 py-1 text-black text-right rounded border">
+              </div>
+              <div class="flex items-center gap-2">
+                <label class="w-36 font-bold text-right">Mínimo:</label>
+                <input type="number" id="prod-min" value="0" class="w-24 px-2 py-1 text-black text-right rounded border">
+              </div>
+              <div class="flex items-center gap-2">
+                <label class="w-36 font-bold text-right">Máximo:</label>
+                <input type="number" id="prod-max" value="0" class="w-24 px-2 py-1 text-black text-right rounded border">
+              </div>
+            </div>
+
+            <div class="flex gap-4 justify-center mt-4">
+              <button type="submit" class="bg-white text-black font-bold px-6 py-2 rounded shadow hover:bg-gray-100">GUARDAR</button>
+              <button type="button" onclick="limpiarFormularioProducto()" class="bg-white text-red-600 font-bold px-6 py-2 rounded shadow hover:bg-gray-100">CANCELAR</button>
+            </div>
+          </form>
+
+          <!-- Carga de Imagen -->
+          <div class="w-64 flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-400 rounded bg-[#161f48] min-h-[250px]">
+            <div class="text-6xl text-gray-400 mb-2">🖼️</div>
+            <button type="button" class="text-sm font-semibold hover:underline">Cargar Imagen de Producto...</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- PIE DE PÁGINA -->
+  <footer class="bg-slate-300 text-slate-800 px-4 py-1 text-xs flex justify-between font-semibold border-t">
+    <div>G-Net Punto de Venta... Teclee o escanee el Código de Producto</div>
+    <div id="reloj-footer">09-Sep 05:06:00 pm</div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
