@@ -1,5 +1,5 @@
 // ==========================================
-// 1. NAVEGACIÓN Y TECLAS DE ACCESO RÁPIDO (F1 - F12)
+// 1. NAVEGACIÓN Y TECLAS DE ACCESO RÁPIDO
 // ==========================================
 function cambiarModulo(modulo) {
   const mVentas = document.getElementById('modulo-ventas');
@@ -24,10 +24,11 @@ function cambiarModulo(modulo) {
   }
 }
 
-// CAPTURA GLOBAL DE TECLAS F1 - F12
-window.addEventListener('keydown', function(e) {
-  if (e.key === 'F12') {
-    e.preventDefault(); // Evita abrir Developer Tools del navegador
+// CAPTURA GLOBAL DE TECLAS TECLADO (F12, F1, F4, etc.)
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'F12' || e.keyCode === 123) {
+    e.preventDefault();
+    e.stopPropagation();
     abrirModalCobrar();
   } else if (e.key === 'F1') {
     e.preventDefault();
@@ -80,7 +81,7 @@ function agregarAlCarrito(producto) {
     existe.cantidad++;
   } else {
     carrito.push({
-      id: producto.id,
+      id: producto.id || Date.now(),
       codigo: producto.codigo,
       nombre: producto.nombre,
       precio: parseFloat(producto.precio) || 0,
@@ -118,12 +119,12 @@ function actualizarTablaCarrito() {
       <td class="p-2 font-semibold text-gray-900">${item.nombre}</td>
       <td class="p-2 text-right font-mono font-bold">$${item.precio.toFixed(2)}</td>
       <td class="p-2 text-center">
-        <input type="number" value="${item.cantidad}" min="1" onchange="actualizarCantidadCarrito(${index}, this.value)" class="w-12 border border-gray-400 rounded p-0.5 text-center font-mono font-bold">
+        <input type="number" value="${item.cantidad}" min="1" onchange="actualizarCantidadCarrito(${index}, this.value)" class="w-12 border border-gray-400 rounded p-0.5 text-center font-mono font-bold text-black">
       </td>
       <td class="p-2 text-right font-mono font-bold text-blue-900">$${subtotal.toFixed(2)}</td>
       <td class="p-2 text-center font-mono text-gray-700">${existencia}</td>
       <td class="p-2 text-center">
-        <button onclick="eliminarDelCarrito(${index})" class="text-red-500 hover:text-red-700 font-bold">✕</button>
+        <button onclick="eliminarDelCarrito(${index})" type="button" class="text-red-500 hover:text-red-700 font-bold">✕</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -155,15 +156,16 @@ function vaciarCarrito() {
 
 
 // ==========================================
-// 3. FUNCIONES DE COBRO Y MODAL
+// 3. FUNCIONES DE COBRO Y MODAL BLINDADAS
 // ==========================================
 function obtenerTotalCarrito() {
-  return carrito.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
+  if (!Array.isArray(carrito)) return 0;
+  return carrito.reduce((acc, item) => acc + (parseFloat(item.precio || 0) * parseInt(item.cantidad || 0)), 0);
 }
 
 function abrirModalCobrar() {
-  if (carrito.length === 0) {
-    alert("El carrito está vacío.");
+  if (!carrito || carrito.length === 0) {
+    alert("El carrito está vacío. Agrega al menos un producto para cobrar.");
     return;
   }
 
@@ -175,9 +177,16 @@ function abrirModalCobrar() {
   if (modal && modalTotal && modalInputPago) {
     modalTotal.innerText = `$ ${total.toFixed(2)}`;
     modalInputPago.value = '';
-    document.getElementById('modal-cambio-pagar').innerText = '$ 0.00';
+    const cambioEl = document.getElementById('modal-cambio-pagar');
+    if (cambioEl) {
+      cambioEl.innerText = '$ 0.00';
+      cambioEl.className = "text-2xl font-bold text-green-600";
+    }
+
     modal.classList.remove('hidden');
-    setTimeout(() => modalInputPago.focus(), 100);
+    setTimeout(() => modalInputPago.focus(), 150);
+  } else {
+    console.error("No se encontró el elemento modal-cobrar en el HTML.");
   }
 }
 
@@ -226,8 +235,8 @@ function procesarCobroFinal() {
   let productosCatalog = JSON.parse(localStorage.getItem('gnet_productos')) || [];
   carrito.forEach(item => {
     const prod = productosCatalog.find(p => p.codigo === item.codigo);
-    if (prod && prod.stock) {
-      prod.stock = Math.max(0, prod.stock - item.cantidad);
+    if (prod && prod.stock !== undefined) {
+      prod.stock = Math.max(0, parseInt(prod.stock) - parseInt(item.cantidad));
     }
   });
   localStorage.setItem('gnet_productos', JSON.stringify(productosCatalog));
@@ -236,3 +245,11 @@ function procesarCobroFinal() {
   vaciarCarrito();
   cerrarModalCobrar();
 }
+
+// VINCULACIÓN DIRECTA AL CARGAR EL DOM
+document.addEventListener('DOMContentLoaded', () => {
+  const btnCobrar = document.getElementById('btn-cobrar-f12');
+  if (btnCobrar) {
+    btnCobrar.addEventListener('click', abrirModalCobrar);
+  }
+});
