@@ -15,29 +15,9 @@ function cambiarModulo(modulo) {
   const moduloActivo = document.getElementById(`modulo-${modulo}`);
   const btnActivo = document.getElementById(`btn-tab-${modulo}`);
 
-  if (moduloActivo) {
-    moduloActivo.classList.remove('hidden');
-  }
-
-  if (btnActivo) {
-    btnActivo.classList.add('ring-2', 'ring-blue-400', 'bg-blue-50');
-  }
+  if (moduloActivo) moduloActivo.classList.remove('hidden');
+  if (btnActivo) btnActivo.classList.add('ring-2', 'ring-blue-400', 'bg-blue-50');
 }
-
-// CAPTURA GLOBAL DE TECLAS TECLADO (F12, F1, F4, etc.)
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'F12' || e.keyCode === 123) {
-    e.preventDefault();
-    e.stopPropagation();
-    abrirModalCobrar();
-  } else if (e.key === 'F1') {
-    e.preventDefault();
-    cambiarModulo('ventas');
-  } else if (e.key === 'F4') {
-    e.preventDefault();
-    cambiarModulo('productos');
-  }
-});
 
 // RELOJ EN TIEMPO REAL
 setInterval(() => {
@@ -153,103 +133,3 @@ function vaciarCarrito() {
   carrito = [];
   actualizarTablaCarrito();
 }
-
-
-// ==========================================
-// 3. FUNCIONES DE COBRO Y MODAL BLINDADAS
-// ==========================================
-function obtenerTotalCarrito() {
-  if (!Array.isArray(carrito)) return 0;
-  return carrito.reduce((acc, item) => acc + (parseFloat(item.precio || 0) * parseInt(item.cantidad || 0)), 0);
-}
-
-function abrirModalCobrar() {
-  if (!carrito || carrito.length === 0) {
-    alert("El carrito está vacío. Agrega al menos un producto para cobrar.");
-    return;
-  }
-
-  const total = obtenerTotalCarrito();
-  const modal = document.getElementById('modal-cobrar');
-  const modalTotal = document.getElementById('modal-total-pagar');
-  const modalInputPago = document.getElementById('modal-input-pago');
-
-  if (modal && modalTotal && modalInputPago) {
-    modalTotal.innerText = `$ ${total.toFixed(2)}`;
-    modalInputPago.value = '';
-    const cambioEl = document.getElementById('modal-cambio-pagar');
-    if (cambioEl) {
-      cambioEl.innerText = '$ 0.00';
-      cambioEl.className = "text-2xl font-bold text-green-600";
-    }
-
-    modal.classList.remove('hidden');
-    setTimeout(() => modalInputPago.focus(), 150);
-  } else {
-    console.error("No se encontró el elemento modal-cobrar en el HTML.");
-  }
-}
-
-function cerrarModalCobrar() {
-  const modal = document.getElementById('modal-cobrar');
-  if (modal) modal.classList.add('hidden');
-}
-
-function calcularCambioCobro() {
-  const total = obtenerTotalCarrito();
-  const pagoInput = parseFloat(document.getElementById('modal-input-pago').value) || 0;
-  const cambioEl = document.getElementById('modal-cambio-pagar');
-
-  const cambio = pagoInput - total;
-  if (cambioEl) {
-    if (cambio >= 0) {
-      cambioEl.innerText = `$ ${cambio.toFixed(2)}`;
-      cambioEl.className = "text-2xl font-bold text-green-600";
-    } else {
-      cambioEl.innerText = `Faltan $ ${Math.abs(cambio).toFixed(2)}`;
-      cambioEl.className = "text-2xl font-bold text-red-600";
-    }
-  }
-}
-
-function evaluarProcesarCobro(e) {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    procesarCobroFinal();
-  }
-}
-
-function procesarCobroFinal() {
-  const total = obtenerTotalCarrito();
-  const pagoInput = parseFloat(document.getElementById('modal-input-pago').value) || 0;
-
-  if (pagoInput < total) {
-    alert("El monto pagado es menor al total a cobrar.");
-    return;
-  }
-
-  const cambio = pagoInput - total;
-  alert(`¡Venta realizada con éxito!\n\nTotal: $${total.toFixed(2)}\nPago: $${pagoInput.toFixed(2)}\nCambio: $${cambio.toFixed(2)}`);
-
-  // Descontar inventario local
-  let productosCatalog = JSON.parse(localStorage.getItem('gnet_productos')) || [];
-  carrito.forEach(item => {
-    const prod = productosCatalog.find(p => p.codigo === item.codigo);
-    if (prod && prod.stock !== undefined) {
-      prod.stock = Math.max(0, parseInt(prod.stock) - parseInt(item.cantidad));
-    }
-  });
-  localStorage.setItem('gnet_productos', JSON.stringify(productosCatalog));
-
-  // Limpiar y cerrar
-  vaciarCarrito();
-  cerrarModalCobrar();
-}
-
-// VINCULACIÓN DIRECTA AL CARGAR EL DOM
-document.addEventListener('DOMContentLoaded', () => {
-  const btnCobrar = document.getElementById('btn-cobrar-f12');
-  if (btnCobrar) {
-    btnCobrar.addEventListener('click', abrirModalCobrar);
-  }
-});
