@@ -1,20 +1,17 @@
 // ==========================================
-// 1. NAVEGACIÓN GENERAL DE MÓDULOS
+// 1. NAVEGACIÓN Y TECLAS DE ACCESO RÁPIDO (F1 - F12)
 // ==========================================
 function cambiarModulo(modulo) {
-  // Ocultar todos los módulos principales
   const mVentas = document.getElementById('modulo-ventas');
   const mProductos = document.getElementById('modulo-productos');
 
   if (mVentas) mVentas.classList.add('hidden');
   if (mProductos) mProductos.classList.add('hidden');
 
-  // Quitar la clase activa visual a los botones del menú superior
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.remove('ring-2', 'ring-blue-400', 'bg-blue-50');
   });
 
-  // Mostrar el módulo solicitado
   const moduloActivo = document.getElementById(`modulo-${modulo}`);
   const btnActivo = document.getElementById(`btn-tab-${modulo}`);
 
@@ -26,6 +23,20 @@ function cambiarModulo(modulo) {
     btnActivo.classList.add('ring-2', 'ring-blue-400', 'bg-blue-50');
   }
 }
+
+// CAPTURA GLOBAL DE TECLAS F1 - F12
+window.addEventListener('keydown', function(e) {
+  if (e.key === 'F12') {
+    e.preventDefault(); // Evita abrir Developer Tools del navegador
+    abrirModalCobrar();
+  } else if (e.key === 'F1') {
+    e.preventDefault();
+    cambiarModulo('ventas');
+  } else if (e.key === 'F4') {
+    e.preventDefault();
+    cambiarModulo('productos');
+  }
+});
 
 // RELOJ EN TIEMPO REAL
 setInterval(() => {
@@ -50,7 +61,6 @@ function evaluarBusquedaVentas(e) {
     const valor = e.target.value.trim().toLowerCase();
     if (!valor) return;
 
-    // Buscar en el catálogo local de productos
     const productosCatalog = JSON.parse(localStorage.getItem('gnet_productos')) || [];
     const prod = productosCatalog.find(p => p.codigo.toLowerCase() === valor || p.nombre.toLowerCase().includes(valor));
 
@@ -141,4 +151,88 @@ function eliminarDelCarrito(index) {
 function vaciarCarrito() {
   carrito = [];
   actualizarTablaCarrito();
+}
+
+
+// ==========================================
+// 3. FUNCIONES DE COBRO Y MODAL
+// ==========================================
+function obtenerTotalCarrito() {
+  return carrito.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
+}
+
+function abrirModalCobrar() {
+  if (carrito.length === 0) {
+    alert("El carrito está vacío.");
+    return;
+  }
+
+  const total = obtenerTotalCarrito();
+  const modal = document.getElementById('modal-cobrar');
+  const modalTotal = document.getElementById('modal-total-pagar');
+  const modalInputPago = document.getElementById('modal-input-pago');
+
+  if (modal && modalTotal && modalInputPago) {
+    modalTotal.innerText = `$ ${total.toFixed(2)}`;
+    modalInputPago.value = '';
+    document.getElementById('modal-cambio-pagar').innerText = '$ 0.00';
+    modal.classList.remove('hidden');
+    setTimeout(() => modalInputPago.focus(), 100);
+  }
+}
+
+function cerrarModalCobrar() {
+  const modal = document.getElementById('modal-cobrar');
+  if (modal) modal.classList.add('hidden');
+}
+
+function calcularCambioCobro() {
+  const total = obtenerTotalCarrito();
+  const pagoInput = parseFloat(document.getElementById('modal-input-pago').value) || 0;
+  const cambioEl = document.getElementById('modal-cambio-pagar');
+
+  const cambio = pagoInput - total;
+  if (cambioEl) {
+    if (cambio >= 0) {
+      cambioEl.innerText = `$ ${cambio.toFixed(2)}`;
+      cambioEl.className = "text-2xl font-bold text-green-600";
+    } else {
+      cambioEl.innerText = `Faltan $ ${Math.abs(cambio).toFixed(2)}`;
+      cambioEl.className = "text-2xl font-bold text-red-600";
+    }
+  }
+}
+
+function evaluarProcesarCobro(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    procesarCobroFinal();
+  }
+}
+
+function procesarCobroFinal() {
+  const total = obtenerTotalCarrito();
+  const pagoInput = parseFloat(document.getElementById('modal-input-pago').value) || 0;
+
+  if (pagoInput < total) {
+    alert("El monto pagado es menor al total a cobrar.");
+    return;
+  }
+
+  const cambio = pagoInput - total;
+  alert(`¡Venta realizada con éxito!\n\nTotal: $${total.toFixed(2)}\nPago: $${pagoInput.toFixed(2)}\nCambio: $${cambio.toFixed(2)}`);
+
+  // Descontar inventario local
+  let productosCatalog = JSON.parse(localStorage.getItem('gnet_productos')) || [];
+  carrito.forEach(item => {
+    const prod = productosCatalog.find(p => p.codigo === item.codigo);
+    if (prod && prod.stock) {
+      prod.stock = Math.max(0, prod.stock - item.cantidad);
+    }
+  });
+  localStorage.setItem('gnet_productos', JSON.stringify(productosCatalog));
+
+  // Limpiar y cerrar
+  vaciarCarrito();
+  cerrarModalCobrar();
 }
