@@ -20,7 +20,7 @@
         </div>
       </div>
 
-      <!-- MENÚ DE NAVEGACIÓN PRINCIPAL (COMPACTO) -->
+      <!-- MENÚ DE NAVEGACIÓN PRINCIPAL -->
       <nav class="flex items-center gap-1.5">
         <button onclick="cambiarModulo('ventas')" id="btn-tab-ventas" class="tab-btn bg-white text-slate-900 font-bold px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs shadow hover:bg-gray-100">
           <span>🛒</span> F1 Ventas
@@ -68,7 +68,6 @@
       
       <!-- BARRA BUSCADOR Y ACCIONES -->
       <div class="flex items-center gap-3">
-        <!-- LOGO MINI PRODUCTO IZQUIERDA -->
         <div class="bg-white text-slate-900 font-bold text-[10px] w-16 h-12 rounded flex text-center items-center justify-center p-1 leading-tight border">
           IMAGEN DEL PRODUCTO
         </div>
@@ -103,12 +102,6 @@
             <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
             <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
             <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
-            <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
-            <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
-            <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
-            <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
-            <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
-            <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
           </div>
         </div>
 
@@ -131,7 +124,7 @@
                 </tr>
               </thead>
               <tbody id="carrito-body">
-                <!-- Filas renderizadas por JS -->
+                <!-- Filas dinámicas -->
               </tbody>
             </table>
           </div>
@@ -152,7 +145,8 @@
         <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">Reimp. Ticket</button>
 
         <div class="ml-auto flex items-stretch gap-2">
-          <button class="bg-white text-slate-900 font-black text-lg px-8 py-2 rounded-lg shadow hover:bg-gray-100 flex items-center justify-center">
+          <!-- BOTÓN F12 CON EVENTO ONCLICK -->
+          <button onclick="abrirModalCobrar()" class="bg-white text-slate-900 font-black text-lg px-8 py-2 rounded-lg shadow hover:bg-gray-100 flex items-center justify-center transition active:scale-95">
             F12 COBRAR
           </button>
           <div id="total-pagar" class="bg-white text-black font-black text-4xl px-6 py-1 rounded-lg shadow flex items-center justify-center min-w-[200px]">
@@ -259,6 +253,42 @@
     </section>
 
   </main>
+
+  <!-- MODAL PARA VENTANA DE COBRO -->
+  <div id="modal-cobrar" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+    <div class="bg-white text-slate-900 rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
+      <div class="bg-[#1b2a4a] text-white p-4 font-bold flex justify-between items-center">
+        <span class="text-lg">💵 Cobrar Venta</span>
+        <button onclick="cerrarModalCobrar()" class="text-gray-300 hover:text-white font-bold text-xl">✕</button>
+      </div>
+
+      <div class="p-6 flex flex-col gap-4">
+        <div class="flex justify-between items-center text-xl font-bold">
+          <span>Total a Pagar:</span>
+          <span id="modal-total-pagar" class="text-3xl font-black text-blue-900">$0.00</span>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="font-bold text-sm text-gray-700">Paga con ($):</label>
+          <input type="number" id="modal-input-pago" step="0.5" placeholder="0.00" oninput="calcularCambioCobro()" onkeydown="evaluarProcesarCobro(event)" class="w-full text-2xl font-bold p-2 border border-gray-400 rounded text-right focus:outline-none focus:ring-2 focus:ring-blue-600">
+        </div>
+
+        <div class="flex justify-between items-center text-lg font-bold border-t pt-3">
+          <span>Cambio:</span>
+          <span id="modal-cambio-pagar" class="text-2xl font-bold text-green-600">$0.00</span>
+        </div>
+
+        <div class="flex gap-3 mt-4">
+          <button onclick="procesarCobroFinal()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-lg shadow">
+            Confirmar Venta
+          </button>
+          <button onclick="cerrarModalCobrar()" class="bg-gray-300 hover:bg-gray-400 text-slate-800 font-bold px-4 py-3 rounded-lg">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- PIE DE PÁGINA -->
   <footer class="bg-[#b3c2d1] text-slate-900 px-4 py-1 text-xs flex justify-between font-semibold border-t border-slate-400">
