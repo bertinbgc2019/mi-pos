@@ -74,14 +74,14 @@
 
         <span class="font-black text-sm tracking-wider">PRODUCTO:</span>
         <input type="text" id="input-buscar-codigo" placeholder="(CAMPO DE CODIGO PRODUCTO)" onkeydown="evaluarBusquedaVentas(event)" class="w-80 px-3 py-1.5 text-black font-medium text-sm rounded outline-none border border-gray-300">
-        <button class="bg-white p-1.5 rounded text-black hover:bg-gray-200 text-lg shadow">📷</button>
+        <button type="button" class="bg-white p-1.5 rounded text-black hover:bg-gray-200 text-lg shadow">📷</button>
 
         <div class="ml-auto flex gap-2">
-          <button onclick="vaciarCarrito()" class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">DEL Borrar carrito</button>
-          <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">🏷️ F11 Mayoreo</button>
-          <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">📥 F7 Entradas</button>
-          <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">📤 F8 Salidas</button>
-          <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">🔍 F9 Verificador</button>
+          <button onclick="vaciarCarrito()" type="button" class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">DEL Borrar carrito</button>
+          <button type="button" class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">🏷️ F11 Mayoreo</button>
+          <button type="button" class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">📥 F7 Entradas</button>
+          <button type="button" class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">📤 F8 Salidas</button>
+          <button type="button" class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">🔍 F9 Verificador</button>
         </div>
       </div>
 
@@ -137,16 +137,16 @@
 
       <!-- BARRA INFERIOR DE BOTONES Y COBRO -->
       <div class="flex items-center gap-2 pt-1">
-        <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100 flex items-center gap-1">🔄 F5 CAMBIAR</button>
-        <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">F6 PENDIENTE</button>
-        <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">ELIMINAR</button>
-        <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">ASIGNAR CLIENTE</button>
-        <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">Ventas del día</button>
-        <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">Reimp. Ticket</button>
+        <button type="button" class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100 flex items-center gap-1">🔄 F5 CAMBIAR</button>
+        <button type="button" class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">F6 PENDIENTE</button>
+        <button type="button" class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">ELIMINAR</button>
+        <button type="button" class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">ASIGNAR CLIENTE</button>
+        <button type="button" class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">Ventas del día</button>
+        <button type="button" class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">Reimp. Ticket</button>
 
         <div class="ml-auto flex items-stretch gap-2">
-          <!-- BOTÓN DE COBRO ASIGNADO ID Y ONCLICK BLINDADO -->
-          <button id="btn-cobrar-f12" onclick="abrirModalCobrar()" type="button" class="bg-white text-slate-900 font-black text-lg px-8 py-2 rounded-lg shadow hover:bg-gray-100 flex items-center justify-center transition active:scale-95 cursor-pointer">
+          <!-- BOTÓN F12 VINCULADO DIRECTO -->
+          <button id="btn-cobrar-accion" type="button" class="bg-white text-slate-900 font-black text-lg px-8 py-2 rounded-lg shadow hover:bg-gray-100 flex items-center justify-center transition active:scale-95 cursor-pointer">
             F12 COBRAR
           </button>
           <div id="total-pagar" class="bg-white text-black font-black text-4xl px-6 py-1 rounded-lg shadow flex items-center justify-center min-w-[200px]">
@@ -163,14 +163,14 @@
     <section id="modulo-productos" class="hidden flex-1 flex flex-col p-4">
       <div class="flex flex-1 gap-6">
         <div class="w-48 flex flex-col gap-2">
-          <button onclick="cambiarSubTabProducto('nuevo')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded bg-slate-700">NUEVO</button>
-          <button onclick="cambiarSubTabProducto('modificar')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">MODIFICAR</button>
-          <button onclick="cambiarSubTabProducto('eliminar')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">ELIMINAR</button>
-          <button onclick="cambiarSubTabProducto('departamentos')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">DEPARTAMENTOS</button>
-          <button onclick="cambiarSubTabProducto('ventas-periodo')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">VENTAS POR PERIODO</button>
-          <button onclick="cambiarSubTabProducto('promociones')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">PROMOCIONES</button>
-          <button onclick="cambiarSubTabProducto('importar')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">IMPORTAR</button>
-          <button onclick="cambiarSubTabProducto('catalogo')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">CATÁLOGO</button>
+          <button onclick="cambiarSubTabProducto('nuevo')" type="button" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded bg-slate-700">NUEVO</button>
+          <button onclick="cambiarSubTabProducto('modificar')" type="button" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">MODIFICAR</button>
+          <button onclick="cambiarSubTabProducto('eliminar')" type="button" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">ELIMINAR</button>
+          <button onclick="cambiarSubTabProducto('departamentos')" type="button" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">DEPARTAMENTOS</button>
+          <button onclick="cambiarSubTabProducto('ventas-periodo')" type="button" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">VENTAS POR PERIODO</button>
+          <button onclick="cambiarSubTabProducto('promociones')" type="button" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">PROMOCIONES</button>
+          <button onclick="cambiarSubTabProducto('importar')" type="button" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">IMPORTAR</button>
+          <button onclick="cambiarSubTabProducto('catalogo')" type="button" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">CATÁLOGO</button>
         </div>
 
         <div id="subvista-producto-formulario" class="flex-1 flex gap-8 items-start">
@@ -254,39 +254,51 @@
 
   </main>
 
-  <!-- MODAL PARA VENTANA DE COBRO -->
-  <div id="modal-cobrar" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-    <div class="bg-white text-slate-900 rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
-      <div class="bg-[#1b2a4a] text-white p-4 font-bold flex justify-between items-center">
-        <span class="text-lg">💵 Cobrar Venta</span>
-        <button onclick="cerrarModalCobrar()" type="button" class="text-gray-300 hover:text-white font-bold text-xl">✕</button>
+  <!-- ========================================== -->
+  <!-- MÓDULO ESPECIAL: VENTANA/MODAL DE COBRO -->
+  <!-- ========================================== -->
+  <div id="modulo-cobro-modal" class="hidden fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white text-slate-900 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col border border-gray-300">
+      
+      <!-- CABECERA MODAL -->
+      <div class="bg-[#1b2a4a] text-white px-6 py-4 font-bold flex justify-between items-center">
+        <div class="flex items-center gap-2 text-xl">
+          <span>💵</span>
+          <span>Modulo de Cobro</span>
+        </div>
+        <button id="btn-cerrar-cobro" type="button" class="text-gray-300 hover:text-white font-bold text-2xl leading-none">✕</button>
       </div>
 
-      <div class="p-6 flex flex-col gap-4">
-        <div class="flex justify-between items-center text-xl font-bold">
-          <span>Total a Pagar:</span>
-          <span id="modal-total-pagar" class="text-3xl font-black text-blue-900">$0.00</span>
+      <!-- CUERPO DEL MÓDULO DE COBRO -->
+      <div class="p-6 flex flex-col gap-5">
+        
+        <div class="bg-slate-100 p-4 rounded-xl border border-slate-200 flex justify-between items-center">
+          <span class="text-slate-600 font-bold text-lg">Total a Pagar:</span>
+          <span id="cobro-total-texto" class="text-4xl font-black text-blue-900">$0.00</span>
         </div>
 
-        <div class="flex flex-col gap-1">
-          <label class="font-bold text-sm text-gray-700">Paga con ($):</label>
-          <input type="number" id="modal-input-pago" step="0.5" placeholder="0.00" oninput="calcularCambioCobro()" onkeydown="evaluarProcesarCobro(event)" class="w-full text-2xl font-bold p-2 border border-gray-400 rounded text-right focus:outline-none focus:ring-2 focus:ring-blue-600 text-black">
+        <div class="flex flex-col gap-1.5">
+          <label class="font-bold text-slate-700 text-sm">Paga con ($):</label>
+          <input type="number" id="cobro-input-paga" step="0.50" placeholder="0.00" class="w-full text-3xl font-black p-3 border-2 border-slate-300 rounded-xl text-right focus:outline-none focus:border-blue-600 text-black bg-white">
         </div>
 
-        <div class="flex justify-between items-center text-lg font-bold border-t pt-3">
-          <span>Cambio:</span>
-          <span id="modal-cambio-pagar" class="text-2xl font-bold text-green-600">$0.00</span>
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex justify-between items-center">
+          <span class="text-slate-600 font-bold text-lg">Cambio:</span>
+          <span id="cobro-cambio-texto" class="text-3xl font-bold text-green-600">$0.00</span>
         </div>
 
-        <div class="flex gap-3 mt-4">
-          <button onclick="procesarCobroFinal()" type="button" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-lg shadow">
-            Confirmar Venta
+        <!-- BOTONERA -->
+        <div class="flex gap-3 mt-2">
+          <button id="btn-confirmar-cobro" type="button" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 rounded-xl text-lg shadow-lg transition active:scale-95">
+            Cobrar e Imprimir
           </button>
-          <button onclick="cerrarModalCobrar()" type="button" class="bg-gray-300 hover:bg-gray-400 text-slate-800 font-bold px-4 py-3 rounded-lg">
+          <button id="btn-cancelar-cobro" type="button" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-6 py-3.5 rounded-xl transition">
             Cancelar
           </button>
         </div>
+
       </div>
+
     </div>
   </div>
 
@@ -296,8 +308,9 @@
     <div id="reloj-footer">09-Sep 03:30:31 pm</div>
   </footer>
 
-  <!-- Carga de scripts en orden correcto -->
+  <!-- Carga de scripts -->
   <script src="js/modulos/ventas.js"></script>
   <script src="js/modulos/productos.js"></script>
+  <script src="js/modulos/cobro.js"></script>
 </body>
 </html>
