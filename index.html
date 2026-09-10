@@ -6,138 +6,168 @@
   <title>G-Net Punto de Venta</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[#1e295d] text-white min-h-screen flex flex-col font-sans select-none">
+<body class="bg-[#1b2a4a] text-white min-h-screen flex flex-col font-sans select-none">
 
-  <!-- CABECERA PRINCIPAL -->
-  <header class="bg-[#1e295d] px-6 py-3 border-b border-blue-900 flex justify-between items-center">
-    <div class="flex items-center gap-3">
-      <div class="text-3xl">🛒</div>
-      <h1 class="text-2xl font-bold tracking-wide">G-Net</h1>
+  <!-- CABECERA SUPERIOR ALINEADA CON MENÚ -->
+  <header class="bg-[#1b2a4a] px-6 py-2 flex items-center justify-between border-b border-slate-800">
+    <div class="flex items-center gap-6">
+      <!-- LOGO G-NET -->
+      <div class="flex items-center gap-2">
+        <span class="text-3xl">🛒</span>
+        <div class="flex flex-col">
+          <h1 class="text-2xl font-black tracking-wider leading-none">G-Net</h1>
+          <span class="text-[10px] tracking-widest text-gray-300 font-mono">o-o-o</span>
+        </div>
+      </div>
+
+      <!-- MENÚ DE NAVEGACIÓN PRINCIPAL (COMPACTO) -->
+      <nav class="flex items-center gap-1.5">
+        <button onclick="cambiarModulo('ventas')" id="btn-tab-ventas" class="tab-btn bg-white text-slate-900 font-bold px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs shadow hover:bg-gray-100">
+          <span>🛒</span> F1 Ventas
+        </button>
+        <button onclick="cambiarModulo('creditos')" id="btn-tab-creditos" class="tab-btn bg-white text-slate-900 font-bold px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs shadow hover:bg-gray-100">
+          <span>💲</span> F2 Créditos
+        </button>
+        <button onclick="cambiarModulo('clientes')" id="btn-tab-clientes" class="tab-btn bg-white text-slate-900 font-bold px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs shadow hover:bg-gray-100">
+          <span>👥</span> F3 Clientes
+        </button>
+        <button onclick="cambiarModulo('productos')" id="btn-tab-productos" class="tab-btn bg-white text-slate-900 font-bold px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs shadow hover:bg-gray-100">
+          <span>📦</span> F4 Productos
+        </button>
+        <button onclick="cambiarModulo('inventario')" id="btn-tab-inventario" class="tab-btn bg-white text-slate-900 font-bold px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs shadow hover:bg-gray-100">
+          <span>📋</span> F5 Inventario
+        </button>
+        <button onclick="cambiarModulo('compras')" id="btn-tab-compras" class="tab-btn bg-white text-slate-900 font-bold px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs shadow hover:bg-gray-100">
+          <span>🚚</span> Compras
+        </button>
+        <button onclick="cambiarModulo('reportes')" id="btn-tab-reportes" class="tab-btn bg-white text-slate-900 font-bold px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs shadow hover:bg-gray-100">
+          <span>📊</span> Reportes
+        </button>
+      </nav>
     </div>
 
-    <!-- MENÚ NAVEGACIÓN SUPERIOR -->
-    <nav class="flex gap-2">
-      <button onclick="cambiarModulo('ventas')" id="btn-tab-ventas" class="tab-btn bg-white text-slate-900 font-bold px-4 py-2 rounded flex items-center gap-2 shadow">
-        🛒 F1 Ventas
-      </button>
-      <button onclick="cambiarModulo('creditos')" id="btn-tab-creditos" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
-        💲 F2 Créditos
-      </button>
-      <button onclick="cambiarModulo('clientes')" id="btn-tab-clientes" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
-        👥 F3 Clientes
-      </button>
-      <button onclick="cambiarModulo('productos')" id="btn-tab-productos" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
-        📦 F4 Productos
-      </button>
-      <button onclick="cambiarModulo('inventario')" id="btn-tab-inventario" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
-        📋 F5 Inventario
-      </button>
-      <button onclick="cambiarModulo('compras')" id="btn-tab-compras" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
-        🚚 Compras
-      </button>
-      <button onclick="cambiarModulo('reportes')" id="btn-tab-reportes" class="tab-btn bg-white/20 hover:bg-white/30 font-bold px-4 py-2 rounded flex items-center gap-2">
-        📊 Reportes
-      </button>
-    </nav>
-
+    <!-- USUARIO -->
     <div class="flex items-center gap-2 font-bold text-sm">
       <span>(BERTIN GARCIA CRUZ)</span>
-      <div class="w-8 h-8 rounded-full bg-slate-400 flex items-center justify-center">👤</div>
+      <div class="w-8 h-8 rounded-full bg-blue-100 text-slate-900 flex items-center justify-center font-bold">👤</div>
     </div>
   </header>
 
+  <!-- SUBTITULO VENTA-TICKET -->
+  <div class="bg-[#1b2a4a] px-6 py-1 font-bold text-sm tracking-wide text-gray-200 border-b border-slate-700">
+    VENTA-TICKET 1
+  </div>
+
   <!-- ÁREA DE MÓDULOS -->
-  <main class="flex-1 flex flex-col relative">
+  <main class="flex-1 flex flex-col relative p-3">
 
     <!-- ========================================== -->
     <!-- MÓDULO 1: VENTAS (ACTIVO POR DEFECTO) -->
     <!-- ========================================== -->
-    <section id="modulo-ventas" class="flex-1 flex flex-col p-4 gap-4">
+    <section id="modulo-ventas" class="flex-1 flex flex-col gap-3">
       
-      <!-- Barra superior de búsqueda -->
+      <!-- BARRA BUSCADOR Y ACCIONES -->
       <div class="flex items-center gap-3">
-        <span class="font-bold text-lg">PRODUCTO:</span>
-        <input type="text" id="input-buscar-codigo" placeholder="(CAMPO DE CODIGO PRODUCTO)" onkeydown="evaluarBusquedaVentas(event)" class="flex-1 max-w-md px-3 py-2 text-black font-semibold rounded outline-none border">
-        <button class="bg-gray-200 p-2 rounded text-black hover:bg-gray-300">📷</button>
+        <!-- LOGO MINI PRODUCTO IZQUIERDA -->
+        <div class="bg-white text-slate-900 font-bold text-[10px] w-16 h-12 rounded flex text-center items-center justify-center p-1 leading-tight border">
+          IMAGEN DEL PRODUCTO
+        </div>
+
+        <span class="font-black text-sm tracking-wider">PRODUCTO:</span>
+        <input type="text" id="input-buscar-codigo" placeholder="(CAMPO DE CODIGO PRODUCTO)" onkeydown="evaluarBusquedaVentas(event)" class="w-80 px-3 py-1.5 text-black font-medium text-sm rounded outline-none border border-gray-300">
+        <button class="bg-white p-1.5 rounded text-black hover:bg-gray-200 text-lg shadow">📷</button>
 
         <div class="ml-auto flex gap-2">
-          <button onclick="vaciarCarrito()" class="bg-white text-slate-900 font-bold px-3 py-1.5 rounded hover:bg-gray-100">DEL Borrar carrito</button>
-          <button class="bg-white text-slate-900 font-bold px-3 py-1.5 rounded hover:bg-gray-100">🏷️ F11 Mayoreo</button>
-          <button class="bg-white text-slate-900 font-bold px-3 py-1.5 rounded hover:bg-gray-100">📥 F7 Entradas</button>
-          <button class="bg-white text-slate-900 font-bold px-3 py-1.5 rounded hover:bg-gray-100">📤 F8 Salidas</button>
-          <button class="bg-white text-slate-900 font-bold px-3 py-1.5 rounded hover:bg-gray-100">🔍 F9 Verificador</button>
+          <button onclick="vaciarCarrito()" class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">DEL Borrar carrito</button>
+          <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">🏷️ F11 Mayoreo</button>
+          <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">📥 F7 Entradas</button>
+          <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">📤 F8 Salidas</button>
+          <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">🔍 F9 Verificador</button>
         </div>
       </div>
 
-      <!-- Cuerpo principal de Ventas -->
-      <div class="flex-1 flex gap-4">
-        <!-- Panel lateral rápido -->
-        <div class="w-64 flex flex-col gap-2">
-          <input type="text" placeholder="BUSCAR PRODUCTO:" class="w-full px-2 py-1 text-black rounded mb-2">
-          <div class="grid grid-cols-3 gap-2">
-            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGEN DEL PRODUCTO</div>
-            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGEN DEL PRODUCTO</div>
-            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGEN DEL PRODUCTO</div>
-            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGEN DEL PRODUCTO</div>
-            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGEN DEL PRODUCTO</div>
-            <div class="bg-slate-200 text-slate-700 h-20 text-[10px] font-bold text-center flex items-center justify-center p-1 rounded border">IMAGEN DEL PRODUCTO</div>
+      <!-- CUERPO PRINCIPAL DE VENTAS -->
+      <div class="flex-1 flex gap-3">
+        
+        <!-- PANEL LATERAL DE PRODUCTOS -->
+        <div class="w-72 bg-[#1b2a4a] flex flex-col gap-2 p-1">
+          <div class="flex items-center gap-1">
+            <span class="text-[11px] font-bold">BUSCAR PRODUCTO:</span>
+            <input type="text" class="flex-1 px-2 py-0.5 text-black text-xs rounded border">
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 mt-1">
+            <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
+            <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
+            <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
+            <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
+            <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
+            <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
+            <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
+            <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
+            <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
+            <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
+            <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
+            <div class="bg-white text-slate-800 h-20 text-[9px] font-bold text-center flex items-center justify-center p-1 rounded-md border shadow">IMAGEN DEL PRODUCTO</div>
           </div>
         </div>
 
-        <!-- Tabla de Carrito -->
-        <div class="flex-1 flex flex-col bg-slate-200 rounded text-black overflow-hidden border">
-          <div class="bg-slate-300 font-bold p-2 text-slate-800 border-b">TICKET 1</div>
-          <div class="flex-1 overflow-y-auto">
-            <table class="w-full text-left border-collapse">
+        <!-- TABLA DE CARRITO Y PESTAÑA TICKET -->
+        <div class="flex-1 flex flex-col bg-slate-200 rounded text-black overflow-hidden shadow">
+          <div class="flex">
+            <div class="bg-slate-300 font-bold px-4 py-1.5 text-xs text-slate-800 rounded-t border-r border-slate-400">TICKET 1</div>
+          </div>
+          <div class="flex-1 overflow-y-auto bg-[#eaf0f6]">
+            <table class="w-full text-left border-collapse text-xs">
               <thead>
-                <tr class="bg-slate-300 text-slate-700 text-xs uppercase border-b">
-                  <th class="p-2">CÓDIGO DE BARRAS</th>
-                  <th class="p-2">DESCRIPCIÓN DEL PRODUCTO</th>
-                  <th class="p-2 text-right">PRECIO</th>
-                  <th class="p-2 text-center">CANTIDAD</th>
-                  <th class="p-2 text-right">IMPORTE</th>
-                  <th class="p-2 text-center">EXISTENCIA</th>
+                <tr class="text-slate-600 border-b border-slate-300">
+                  <th class="p-2 font-bold uppercase">CÓDIGO DE BARRAS</th>
+                  <th class="p-2 font-bold uppercase">DESCRIPCIÓN DEL PRODUCTO</th>
+                  <th class="p-2 text-right font-bold uppercase">PRECIO</th>
+                  <th class="p-2 text-center font-bold uppercase">CANTIDAD</th>
+                  <th class="p-2 text-right font-bold uppercase">IMPORTE</th>
+                  <th class="p-2 text-center font-bold uppercase">EXISTENCIA</th>
                   <th class="p-2 text-center"></th>
                 </tr>
               </thead>
               <tbody id="carrito-body">
-                <!-- Se llena dinámicamente -->
+                <!-- Filas renderizadas por JS -->
               </tbody>
             </table>
           </div>
-          <div id="contador-productos-carrito" class="bg-slate-300 p-2 font-bold text-slate-700 text-sm border-t">
+          <div id="contador-productos-carrito" class="bg-[#c2cfdd] p-2 font-bold text-slate-800 text-xs border-t border-slate-300">
             0 Productos en la Venta actual
           </div>
         </div>
+
       </div>
 
-      <!-- Barra inferior de acciones y cobro -->
-      <div class="flex items-center gap-2 pt-2">
-        <button class="bg-white text-slate-900 font-bold px-3 py-2 rounded">💵 F5 CAMBIAR</button>
-        <button class="bg-white text-slate-900 font-bold px-3 py-2 rounded">F6 PENDIENTE</button>
-        <button class="bg-white text-slate-900 font-bold px-3 py-2 rounded">ELIMINAR</button>
-        <button class="bg-white text-slate-900 font-bold px-3 py-2 rounded">ASIGNAR CLIENTE</button>
-        <button class="bg-white text-slate-900 font-bold px-3 py-2 rounded">Ventas del día</button>
-        <button class="bg-white text-slate-900 font-bold px-3 py-2 rounded">Reimp. Ticket</button>
+      <!-- BARRA INFERIOR DE BOTONES Y COBRO -->
+      <div class="flex items-center gap-2 pt-1">
+        <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100 flex items-center gap-1">🔄 F5 CAMBIAR</button>
+        <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">F6 PENDIENTE</button>
+        <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">ELIMINAR</button>
+        <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">ASIGNAR CLIENTE</button>
+        <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">Ventas del día</button>
+        <button class="bg-white text-slate-900 font-semibold px-3 py-1.5 rounded-md text-xs shadow hover:bg-gray-100">Reimp. Ticket</button>
 
-        <div class="ml-auto flex items-center gap-4">
-          <button class="bg-white text-black font-black text-xl px-8 py-3 rounded shadow hover:bg-gray-100">
+        <div class="ml-auto flex items-stretch gap-2">
+          <button class="bg-white text-slate-900 font-black text-lg px-8 py-2 rounded-lg shadow hover:bg-gray-100 flex items-center justify-center">
             F12 COBRAR
           </button>
-          <div id="total-pagar" class="bg-white text-black font-black text-3xl px-8 py-2 rounded shadow text-center min-w-[180px]">
-            $0.00
+          <div id="total-pagar" class="bg-white text-black font-black text-4xl px-6 py-1 rounded-lg shadow flex items-center justify-center min-w-[200px]">
+            $ 0.00
           </div>
         </div>
       </div>
+
     </section>
 
     <!-- ========================================== -->
     <!-- MÓDULO 2: PRODUCTOS (OCULTO DE INICIO) -->
     <!-- ========================================== -->
     <section id="modulo-productos" class="hidden flex-1 flex flex-col p-4">
-      
       <div class="flex flex-1 gap-6">
-        <!-- Menú Lateral -->
         <div class="w-48 flex flex-col gap-2">
           <button onclick="cambiarSubTabProducto('nuevo')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded bg-slate-700">NUEVO</button>
           <button onclick="cambiarSubTabProducto('modificar')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">MODIFICAR</button>
@@ -149,7 +179,6 @@
           <button onclick="cambiarSubTabProducto('catalogo')" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white rounded hover:bg-slate-700">CATÁLOGO</button>
         </div>
 
-        <!-- Vista Formulario de Registro -->
         <div id="subvista-producto-formulario" class="flex-1 flex gap-8 items-start">
           <form id="form-producto" onsubmit="guardarProducto(event)" class="flex-1 flex flex-col gap-2 text-sm max-w-xl">
             <div class="flex items-center gap-2">
@@ -221,26 +250,23 @@
             </div>
           </form>
 
-          <!-- Carga de Imagen -->
           <div class="w-64 flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-400 rounded bg-[#161f48] min-h-[250px]">
             <div class="text-6xl text-gray-400 mb-2">🖼️</div>
             <button type="button" class="text-sm font-semibold hover:underline">Cargar Imagen de Producto...</button>
           </div>
         </div>
-
       </div>
     </section>
 
   </main>
 
   <!-- PIE DE PÁGINA -->
-  <footer class="bg-slate-300 text-slate-800 px-4 py-1 text-xs flex justify-between font-semibold border-t">
+  <footer class="bg-[#b3c2d1] text-slate-900 px-4 py-1 text-xs flex justify-between font-semibold border-t border-slate-400">
     <div>G-Net Punto de Venta... Teclee o escanee el Código de Producto</div>
-    <div id="reloj-footer">09-Sep 05:06:00 pm</div>
+    <div id="reloj-footer">09-Sep 03:30:31 pm</div>
   </footer>
 
-  <!-- Carga de scripts modularizada -->
-  <script src="js/main.js"></script>
+  <!-- Carga de scripts -->
   <script src="js/modulos/ventas.js"></script>
   <script src="js/modulos/productos.js"></script>
 </body>
