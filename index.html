@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>G-Net Punto de Venta</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Librería para el escáner de código de barras por cámara -->
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body class="bg-[#1b2a4a] text-white min-h-screen flex flex-col font-sans select-none">
@@ -58,16 +57,89 @@
 
   <main class="flex-1 flex flex-col relative p-3">
 
-    <!-- MÓDULO 1: VENTAS (Se mantiene igual) -->
+    <!-- MÓDULO 1: VENTAS (COMPLETO Y CORREGIDO) -->
     <section id="modulo-ventas" class="flex-1 flex flex-col gap-3">
-      <!-- Contenido de ventas... -->
+      <!-- BARRA DE BÚSQUEDA -->
+      <div class="bg-white rounded-xl p-4 shadow-lg border-2 border-slate-700">
+        <div class="flex items-center gap-3">
+          <label class="font-bold text-slate-900 text-lg">🔍 Buscar:</label>
+          <input 
+            type="text" 
+            id="barcode-input" 
+            placeholder="Escanea o escribe el código/nombre y presiona Enter..." 
+            class="flex-1 px-4 py-3 text-black text-lg font-mono font-bold border-2 border-slate-400 rounded-lg focus:outline-none focus:border-blue-500"
+            onkeydown="evaluarBusquedaVentas(event)"
+            autocomplete="off"
+          >
+          <button 
+            type="button" 
+            onclick="abrirCamaraEscanerVenta()" 
+            class="bg-blue-600 text-white px-4 py-3 rounded-lg font-bold hover:bg-blue-700 shadow flex items-center gap-2"
+          >
+            📷 Escanear
+          </button>
+        </div>
+      </div>
+
+      <!-- TABLA DEL CARRITO -->
+      <div class="flex-1 bg-white rounded-xl p-4 shadow-lg border-2 border-slate-700 overflow-hidden flex flex-col">
+        <div class="overflow-y-auto flex-1">
+          <table class="w-full text-left border-collapse">
+            <thead class="sticky top-0 bg-slate-800 text-white text-sm uppercase tracking-wide z-10">
+              <tr>
+                <th class="p-3 font-bold">Código</th>
+                <th class="p-3 font-bold">Descripción</th>
+                <th class="p-3 font-bold text-right">Precio</th>
+                <th class="p-3 font-bold text-center">Cantidad</th>
+                <th class="p-3 font-bold text-right">Subtotal</th>
+                <th class="p-3 font-bold text-center">Stock</th>
+                <th class="p-3 font-bold text-center">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="carrito-body" class="text-sm">
+              <!-- Los productos se agregan dinámicamente aquí -->
+            </tbody>
+          </table>
+          <div id="carrito-vacio" class="flex-1 flex items-center justify-center text-gray-500 font-bold text-lg py-10">
+            🛒 No hay productos en el carrito
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL INFERIOR: TOTALES Y BOTONES -->
+      <div class="bg-white rounded-xl p-4 shadow-lg border-2 border-slate-700">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-6">
+            <div class="text-3xl font-black text-slate-900">
+              TOTAL: <span id="total-pagar" class="text-blue-600">$0.00</span>
+            </div>
+            <div id="contador-productos-carrito" class="text-sm font-bold text-gray-600">
+              0 Productos en la Venta actual
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <button 
+              onclick="vaciarCarrito()" 
+              type="button" 
+              class="bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700 shadow"
+            >
+              🗑️ Cancelar
+            </button>
+            <button 
+              onclick="procesarCobro()" 
+              type="button" 
+              class="bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700 shadow text-lg"
+            >
+              💰 COBRAR (F5)
+            </button>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- MÓDULO 2: PRODUCTOS -->
+    <!-- MÓDULO 2: PRODUCTOS (Se mantiene tu código original) -->
     <section id="modulo-productos" class="hidden flex-1 flex flex-col p-4">
       <div class="flex flex-1 gap-6">
-
-        <!-- MENÚ LATERAL CON CAMBIO DINÁMICO DE COLOR -->
         <div class="w-48 flex flex-col gap-2" id="contenedor-subtabs-producto">
           <button onclick="cambiarSubTabProducto('nuevo')" id="subtab-nuevo" type="button" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white/40 rounded transition-all bg-blue-600 text-white shadow">NUEVO</button>
           <button onclick="cambiarSubTabProducto('modificar')" id="subtab-modificar" type="button" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white/40 rounded transition-all hover:bg-slate-700 text-gray-200">MODIFICAR</button>
@@ -79,53 +151,38 @@
           <button onclick="cambiarSubTabProducto('catalogo')" id="subtab-catalogo" type="button" class="subtab-btn w-full text-left px-3 py-2 font-bold border border-white/40 rounded transition-all hover:bg-slate-700 text-gray-200">CATÁLOGO</button>
         </div>
 
-        <!-- FORMULARIO DE PRODUCTO -->
         <div id="subvista-producto-formulario" class="flex-1 flex gap-8 items-start">
           <form id="form-producto" onsubmit="guardarProducto(event)" class="flex-1 flex flex-col gap-2 text-sm max-w-xl">
-            
             <div class="flex items-center gap-2">
               <label class="w-36 font-bold text-right">Código de Barras:</label>
               <input type="text" id="prod-codigo" required oninput="verificarCodigoExistente(this.value)" class="flex-1 px-2 py-1 text-black rounded border font-mono font-bold focus:outline-none focus:ring-2 focus:ring-blue-500">
-              
-              <!-- BOTÓN CÁMARA PARA ESCANEAR -->
               <button type="button" onclick="abrirCamaraEscaner()" class="bg-white p-1.5 rounded text-black hover:bg-gray-200 shadow active:scale-95 transition" title="Escanear con cámara">📷</button>
             </div>
-            
-            <!-- ALERTA DE CÓDIGO EXISTENTE -->
-            <div id="alerta-codigo-existente" class="hidden text-xs text-yellow-300 font-bold ml-36 bg-yellow-900/50 p-1.5 rounded border border-yellow-500">
-              ⚠️ ¡Aviso! Este código ya existe en el catálogo.
-            </div>
-
+            <div id="alerta-codigo-existente" class="hidden text-xs text-yellow-300 font-bold ml-36 bg-yellow-900/50 p-1.5 rounded border border-yellow-500">⚠️ ¡Aviso! Este código ya existe en el catálogo.</div>
             <div class="flex items-center gap-2">
               <label class="w-36 font-bold text-right">Descripción:</label>
               <input type="text" id="prod-nombre" required class="flex-1 px-2 py-1 text-black rounded border">
             </div>
-
             <div class="flex items-center gap-2 pl-36">
               <label class="flex items-center gap-1"><input type="radio" name="tipo_venta" value="unidad" checked> Por Unidad/Pza</label>
               <label class="flex items-center gap-1 ml-4"><input type="radio" name="tipo_venta" value="granel"> A Granel</label>
             </div>
-
             <div class="flex items-center gap-2">
               <label class="w-36 font-bold text-right">Precio Costo:</label>
               <input type="number" step="0.01" id="prod-costo" value="0.00" oninput="calcularPrecios()" class="w-32 px-2 py-1 text-black text-right rounded border">
             </div>
-
             <div class="flex items-center gap-2">
               <label class="w-36 font-bold text-right">Ganancia:</label>
               <input type="number" step="0.1" id="prod-ganancia" value="0.0" oninput="calcularPrecios()" class="w-32 px-2 py-1 text-black text-right rounded border">%
             </div>
-
             <div class="flex items-center gap-2">
               <label class="w-36 font-bold text-right">Precio Venta:</label>
               <input type="number" step="0.01" id="prod-precio" value="0.00" class="w-32 px-2 py-1 text-black text-right rounded border">
             </div>
-
             <div class="flex items-center gap-2">
               <label class="w-36 font-bold text-right">Precio Mayoreo:</label>
               <input type="number" step="0.01" id="prod-mayoreo" value="0.00" class="w-32 px-2 py-1 text-black text-right rounded border">
             </div>
-
             <div class="flex items-center gap-2">
               <label class="w-36 font-bold text-right">Departamento:</label>
               <select id="prod-depto" class="flex-1 px-2 py-1 text-black rounded border">
@@ -134,12 +191,10 @@
                 <option value="Papelería">Papelería</option>
               </select>
             </div>
-
             <div class="flex items-center gap-2 mt-1">
               <label class="w-36 font-bold text-right">Utiliza Inventario:</label>
               <input type="checkbox" id="prod-usa-inv" checked>
             </div>
-
             <div class="flex flex-col gap-2">
               <div class="flex items-center gap-2">
                 <label class="w-36 font-bold text-right">Hay:</label>
@@ -154,30 +209,23 @@
                 <input type="number" id="prod-max" value="0" class="w-24 px-2 py-1 text-black text-right rounded border">
               </div>
             </div>
-
             <div class="flex gap-4 justify-center mt-4">
               <button type="submit" class="bg-white text-black font-bold px-6 py-2 rounded shadow hover:bg-gray-100">GUARDAR</button>
               <button type="button" onclick="limpiarFormularioProducto()" class="bg-white text-red-600 font-bold px-6 py-2 rounded shadow hover:bg-gray-100">CANCELAR</button>
             </div>
           </form>
 
-          <!-- ÁREA RECTANGULAR DE CARGA / VISTA PREVIA DE IMAGEN -->
           <div class="w-64 flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-400 rounded-xl bg-[#161f48] min-h-[250px] relative overflow-hidden group">
-            
             <input type="file" id="input-prod-imagen" accept="image/*" class="hidden" onchange="procesarImagenProducto(event)">
-            
             <div id="contenedor-placeholder-img" class="flex flex-col items-center justify-center cursor-pointer" onclick="document.getElementById('input-prod-imagen').click()">
               <div class="text-6xl text-gray-400 mb-2">🖼️</div>
               <span class="text-sm font-semibold hover:underline text-center">Cargar Imagen de Producto...</span>
             </div>
-
             <div id="contenedor-preview-img" class="hidden absolute inset-0 w-full h-full bg-[#161f48] flex flex-col items-center justify-center">
               <img id="img-preview" src="" alt="Vista previa" class="w-full h-full object-cover">
               <button type="button" onclick="quitarImagenProducto()" class="absolute top-2 right-2 bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center font-bold shadow hover:bg-red-700">✕</button>
             </div>
-
           </div>
-
         </div>
       </div>
     </section>
@@ -191,14 +239,13 @@
         <h3 class="font-bold text-lg flex items-center gap-2">📷 Escanear Código de Barras</h3>
         <button type="button" onclick="cerrarCamaraEscaner()" class="text-gray-500 hover:text-black font-bold text-2xl">✕</button>
       </div>
-      
-      <!-- Visor de la Cámara -->
       <div id="reader" class="w-full bg-black rounded-lg overflow-hidden min-h-[250px]"></div>
-
       <button type="button" onclick="cerrarCamaraEscaner()" class="bg-slate-200 text-slate-800 font-bold py-2 rounded-lg hover:bg-slate-300">Cancelar</button>
     </div>
   </div>
 
+  <!-- SCRIPTS (Orden importante: router primero) -->
+  <script src="js/router.js"></script>
   <script src="js/modulos/ventas.js"></script>
   <script src="js/modulos/productos.js"></script>
   <script src="js/modulos/cobro.js"></script>
