@@ -20,21 +20,36 @@ function iniciarReloj() {
 }
 
 function cambiarModulo(modulo) {
-  // Oculta todos los módulos
+  // 1. Oculta TODOS los módulos
   document.querySelectorAll('[id^="modulo-"]').forEach(el => el.classList.add('hidden'));
-  document.querySelectorAll('.btn-toolbar').forEach(el => el.classList.remove('active'));
+  
+  // 2. Quita el estado activo de TODOS los botones de navegación
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('ring-2', 'ring-blue-400', 'bg-blue-50');
+  });
 
-  // Muestra el módulo seleccionado
+  // 3. Muestra el módulo seleccionado
   const modTarget = document.getElementById(`modulo-${modulo}`);
-  const navTarget = document.getElementById(`nav-${modulo}`);
+  if (modTarget) {
+    modTarget.classList.remove('hidden');
+  }
 
-  if (modTarget) modTarget.classList.remove('hidden');
-  if (navTarget) navTarget.classList.add('active');
+  // 4. Activa el botón de navegación correspondiente
+  const btnActivo = document.getElementById(`btn-tab-${modulo}`);
+  if (btnActivo) {
+    btnActivo.classList.add('ring-2', 'ring-blue-400', 'bg-blue-50');
+  }
 
-  // Enfoque automático en campos de texto según el módulo activo
-  if (modulo === 'ventas' && document.getElementById('barcode-input')) {
-    setTimeout(() => document.getElementById('barcode-input').focus(), 100);
-  } else if (modulo === 'productos' && document.getElementById('prod-codigo')) {
-    setTimeout(() => document.getElementById('prod-codigo').focus(), 100);
+  // 5. Enfoque automático en campos de texto según el módulo activo
+  if (modulo === 'ventas') {
+    const barcodeInput = document.getElementById('barcode-input');
+    if (barcodeInput) {
+      setTimeout(() => barcodeInput.focus(), 100);
+    }
+  } else if (modulo === 'productos') {
+    const prodCodigo = document.getElementById('prod-codigo');
+    if (prodCodigo) {
+      setTimeout(() => prodCodigo.focus(), 100);
+    }
   }
 }
