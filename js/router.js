@@ -44,7 +44,11 @@ function cambiarModulo(modulo) {
   if (modulo === 'ventas') {
     const barcodeInput = document.getElementById('barcode-input');
     if (barcodeInput) {
-      setTimeout(() => barcodeInput.focus(), 100);
+      setTimeout(() => {
+        barcodeInput.focus();
+        // También renderizamos el grid de productos al entrar a ventas
+        renderizarGridProductos();
+      }, 100);
     }
   } else if (modulo === 'productos') {
     const prodCodigo = document.getElementById('prod-codigo');
