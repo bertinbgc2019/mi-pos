@@ -1,38 +1,5 @@
 // ==========================================
-// 1. NAVEGACIÓN Y TECLAS DE ACCESO RÁPIDO
-// ==========================================
-function cambiarModulo(modulo) {
-  const mVentas = document.getElementById('modulo-ventas');
-  const mProductos = document.getElementById('modulo-productos');
-
-  if (mVentas) mVentas.classList.add('hidden');
-  if (mProductos) mProductos.classList.add('hidden');
-
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.classList.remove('ring-2', 'ring-blue-400', 'bg-blue-50');
-  });
-
-  const moduloActivo = document.getElementById(`modulo-${modulo}`);
-  const btnActivo = document.getElementById(`btn-tab-${modulo}`);
-
-  if (moduloActivo) moduloActivo.classList.remove('hidden');
-  if (btnActivo) btnActivo.classList.add('ring-2', 'ring-blue-400', 'bg-blue-50');
-}
-
-// RELOJ EN TIEMPO REAL
-setInterval(() => {
-  const reloj = document.getElementById('reloj-footer');
-  if (reloj) {
-    const ahora = new Date();
-    const opcionesFecha = { day: '2-digit', month: 'short' };
-    const opcionesHora = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
-    reloj.innerText = `${ahora.toLocaleDateString('es-ES', opcionesFecha)} ${ahora.toLocaleTimeString('es-ES', opcionesHora)}`;
-  }
-}, 1000);
-
-
-// ==========================================
-// 2. LÓGICA DEL CARRITO Y VENTAS
+// 1. LÓGICA DEL CARRITO Y VENTAS
 // ==========================================
 let carrito = [];
 
@@ -47,9 +14,9 @@ function evaluarBusquedaVentas(e) {
 
     if (prod) {
       agregarAlCarrito(prod);
-      e.target.value = '';
+      e.target.value = ''; // Limpiar input después de agregar
     } else {
-      alert("Producto no encontrado en el catálogo.");
+      alert("⚠️ Producto no encontrado en el catálogo.");
     }
   }
 }
@@ -68,7 +35,6 @@ function agregarAlCarrito(producto) {
       cantidad: 1
     });
   }
-
   actualizarTablaCarrito();
 }
 
@@ -76,6 +42,7 @@ function actualizarTablaCarrito() {
   const tbody = document.getElementById('carrito-body');
   const totalEl = document.getElementById('total-pagar');
   const contadorEl = document.getElementById('contador-productos-carrito');
+  const vacioEl = document.getElementById('carrito-vacio');
 
   if (!tbody) return;
   tbody.innerHTML = '';
@@ -83,6 +50,13 @@ function actualizarTablaCarrito() {
   let total = 0;
   let totalArticulos = 0;
   const productosCatalog = JSON.parse(localStorage.getItem('gnet_productos')) || [];
+
+  // Mostrar u ocultar mensaje de carrito vacío
+  if (carrito.length === 0) {
+    if (vacioEl) vacioEl.classList.remove('hidden');
+  } else {
+    if (vacioEl) vacioEl.classList.add('hidden');
+  }
 
   carrito.forEach((item, index) => {
     const subtotal = item.precio * item.cantidad;
@@ -99,12 +73,12 @@ function actualizarTablaCarrito() {
       <td class="p-2 font-semibold text-gray-900">${item.nombre}</td>
       <td class="p-2 text-right font-mono font-bold">$${item.precio.toFixed(2)}</td>
       <td class="p-2 text-center">
-        <input type="number" value="${item.cantidad}" min="1" onchange="actualizarCantidadCarrito(${index}, this.value)" class="w-12 border border-gray-400 rounded p-0.5 text-center font-mono font-bold text-black">
+        <input type="number" value="${item.cantidad}" min="1" onchange="actualizarCantidadCarrito(${index}, this.value)" class="w-16 border border-gray-400 rounded p-1 text-center font-mono font-bold text-black">
       </td>
       <td class="p-2 text-right font-mono font-bold text-blue-900">$${subtotal.toFixed(2)}</td>
       <td class="p-2 text-center font-mono text-gray-700">${existencia}</td>
       <td class="p-2 text-center">
-        <button onclick="eliminarDelCarrito(${index})" type="button" class="text-red-500 hover:text-red-700 font-bold">✕</button>
+        <button onclick="eliminarDelCarrito(${index})" type="button" class="text-red-500 hover:text-red-700 font-bold text-xl">✕</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -130,6 +104,73 @@ function eliminarDelCarrito(index) {
 }
 
 function vaciarCarrito() {
-  carrito = [];
-  actualizarTablaCarrito();
+  if(carrito.length > 0 && confirm('¿Estás seguro de cancelar esta venta?')) {
+    carrito = [];
+    actualizarTablaCarrito();
+  }
+}
+
+// ==========================================
+// 2. FUNCIONES DE CÁMARA Y COBRO PARA VENTAS
+// ==========================================
+let html5QrCodeVenta = null;
+
+function abrirCamaraEscanerVenta() {
+  const modal = document.getElementById('modal-escaner-camara');
+  if (modal) modal.classList.remove('hidden');
+  
+  html5QrCodeVenta = new Html5Qrcode("reader");
+  const config = {
+    fps: 10,
+    qrbox: { width: 250, height: 150 },
+    aspectRatio: 1.0
+  };
+  
+  html5QrCodeVenta.start(
+    { facingMode: "environment" },
+    config,
+    (decodedText) => {
+      const valor = decodedText.trim().toLowerCase();
+      const productosCatalog = JSON.parse(localStorage.getItem('gnet_productos')) || [];
+      const prod = productosCatalog.find(p => 
+        p.codigo.toLowerCase() === valor || 
+        p.nombre.toLowerCase().includes(valor)
+      );
+      
+      if (prod) {
+        agregarAlCarrito(prod);
+      } else {
+        alert("⚠️ Producto no encontrado: " + decodedText);
+      }
+      cerrarCamaraEscanerVenta();
+    },
+    (errorMessage) => { /* Ignorar errores de frame */ }
+  ).catch(err => {
+    alert("No se pudo acceder a la cámara. Asegúrate de dar los permisos necesarios.");
+    cerrarCamaraEscanerVenta();
+  });
+}
+
+function cerrarCamaraEscanerVenta() {
+  const modal = document.getElementById('modal-escaner-camara');
+  if (html5QrCodeVenta) {
+    html5QrCodeVenta.stop().then(() => {
+      html5QrCodeVenta.clear();
+      if (modal) modal.classList.add('hidden');
+    }).catch(err => {
+      if (modal) modal.classList.add('hidden');
+    });
+  } else {
+    if (modal) modal.classList.add('hidden');
+  }
+}
+
+function procesarCobro() {
+  if (carrito.length === 0) {
+    alert("⚠️ No hay productos en el carrito para cobrar.");
+    return;
+  }
+  const total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+  alert(`💰 Total a cobrar: $${total.toFixed(2)}\n\n(Aquí se integrará el modal de cobro.js)`);
+  // Aquí puedes llamar a tu función de cobro, ej: iniciarProcesoCobro(total);
 }
